@@ -43,10 +43,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ezinkow/mlbplayoffs.git"
+    "url": "git+https://github.com/ezinkow/fantasyplayoffs.git"
   },
   "bugs": {
-    "url": "https://github.com/ezinkow/mlbplayoffs/issues"
+    "url": "https://github.com/ezinkow/fantasyplayoffs/issues"
   },
-  "homepage": "https://github.com/ezinkow/mlbplayoffs#readme"
+  "homepage": "https://github.com/ezinkow/fantasyplayoffs#readme"
 }
