@@ -1,21 +1,23 @@
 // Dependencies
 const express = require("express");
+const cors = require("cors");
+const path = require("path");
 
 // Sets up the Express App
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const path = require('path')
-
 // Requiring our models for syncing
 const db = require("./models");
 
+// Middleware
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Static directory to be served
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/build'));
+// Static React build (production)
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
 }
 
 // Routes
@@ -26,9 +28,16 @@ require("./routes/standings-api-routes.js")(app);
 require("./routes/startingrosters-api-routes.js")(app);
 require("./routes/gamestates-api-routes.js")(app);
 
-// Starts the server to begin listening
-db.sequelize.sync({ force: false }).then(function () {
-  app.listen(PORT, function () {
-    console.log("App listening on PORT " + PORT);
+// React Router fallback
+if (process.env.NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client/build/index.html"));
+  });
+}
+
+// Start server
+db.sequelize.sync({ force: false }).then(() => {
+  app.listen(PORT, () => {
+    console.log(`App listening on PORT ${PORT}`);
   });
 });

@@ -56,15 +56,16 @@ export default function Rules() {
 
                 <ul style={{ paddingLeft: "18px" }}>
                     <li>
-                        <strong>Passing:</strong> 1 yard = 0.04 pts · TD = 4 pts
+                        <strong>Passing:</strong> 1 yard = 0.04 pts · TD = 4 pts · Interception thrown = -1 pt
                     </li>
                     <li>
                         <strong>Rushing / Receiving:</strong> 1 yard = 0.1 pts · TD = 6 pts ·
                         Reception = 1 pt
                     </li>
                     <li>
-                        <strong>Tight Ends score as Wide Receivers</strong>
-                    </li>
+                        <strong>Miscellaneous:</strong> Fumble lost = -2 pts · 2-point conversion = 2 pts</li>
+                    <li><strong>Superflex</strong> = QB/WR/RB/TE</li>
+                    <li><strong>TE</strong> = WR</li>
                 </ul>
             </div>
         </div>
