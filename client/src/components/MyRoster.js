@@ -14,14 +14,20 @@ const positionColors = {
     QB: { bg: "#fee2e2", text: "#991b1b" },
     RB: { bg: "#d1fae5", text: "#065f46" },
     WR: { bg: "#dbeafe", text: "#1e3a8a" },
-    TE: { bg: "#dbeafe", text: "#1e3a8a" }, // TE same as WR
+    TE: { bg: "#dbeafe", text: "#1e3a8a" },
     SUPERFLEX: { bg: "#fef2f8", text: "#9d174d" },
     default: { bg: "#f3f4f6", text: "#1f2937" },
 };
 
 export default function MyRoster() {
+    const navigate = useNavigate();
+
     const [names, setNames] = useState([]);
     const [selectedName, setSelectedName] = useState("");
+    const [password, setPassword] = useState("");
+    const [authenticated, setAuthenticated] = useState(false);
+    const [authError, setAuthError] = useState(false);
+
     const [selectedRound, setSelectedRound] = useState("1");
     const [availablePlayers, setAvailablePlayers] = useState([]);
     const [slots, setSlots] = useState({
@@ -31,90 +37,64 @@ export default function MyRoster() {
         SUPERFLEX: [],
     });
 
-    // Fetch names
+    /* Fetch names */
     useEffect(() => {
         async function fetchNames() {
-            try {
-                const response = await axios("/api/names");
-                const sorted = response.data.sort((a, b) =>
-                    a.name.localeCompare(b.name)
-                );
-                setNames(sorted);
-            } catch (err) {
-                console.error(err);
-            }
+            const res = await axios("/api/names");
+            setNames(res.data.sort((a, b) => a.name.localeCompare(b.name)));
         }
         fetchNames();
     }, []);
 
-    // Fetch players on name or round change
+    /* Verify password */
+    const handleVerify = async () => {
+        setAuthError(false);
+
+        try {
+            await axios.post("/api/names/verify", {
+                name: selectedName,
+                password,
+            });
+
+            setAuthenticated(true);
+            toast.success("Password verified");
+        } catch {
+            setAuthError(true);
+            toast.error("Incorrect password");
+        }
+    };
+
+    /* Fetch players ONLY after auth */
     useEffect(() => {
-        if (!selectedName) return;
+        if (!authenticated || !selectedName) return;
 
         async function fetchPlayers() {
-            try {
-                const response = await axios.get(
-                    "/api/rosters/getmyroster",
-                    { params: { name: selectedName } }
-                );
-                setAvailablePlayers(response.data);
-                setSlots({ QB: [], RB: [], WR: [], SUPERFLEX: [] });
-            } catch (err) {
-                console.error(err);
-            }
+            const res = await axios.get("/api/rosters/getmyroster", {
+                params: { name: selectedName },
+            });
+            setAvailablePlayers(res.data);
+            setSlots({ QB: [], RB: [], WR: [], SUPERFLEX: [] });
         }
 
         fetchPlayers();
-    }, [selectedName, selectedRound]);
+    }, [authenticated, selectedName, selectedRound]);
 
-    // Determine slot for a player
     const determineSlot = (player) => {
         const rules = ROUND_RULES[selectedRound];
 
-        // QB → QB first
-        if (
-            player.position === "QB" &&
-            slots.QB.length < rules.QB
-        ) {
-            return "QB";
-        }
-
-        // RB → RB first
-        if (
-            player.position === "RB" &&
-            slots.RB.length < rules.RB
-        ) {
-            return "RB";
-        }
-
-        // WR / TE → WR first
-        if (
-            (player.position === "WR" || player.position === "TE") &&
-            slots.WR.length < rules.WR
-        ) {
-            return "WR";
-        }
-
-        // Overflow → SUPERFLEX
-        if (slots.SUPERFLEX.length < rules.SUPERFLEX) {
-            return "SUPERFLEX";
-        }
+        if (player.position === "QB" && slots.QB.length < rules.QB) return "QB";
+        if (player.position === "RB" && slots.RB.length < rules.RB) return "RB";
+        if ((player.position === "WR" || player.position === "TE") && slots.WR.length < rules.WR) return "WR";
+        if (slots.SUPERFLEX.length < rules.SUPERFLEX) return "SUPERFLEX";
 
         return null;
     };
 
-
     const addToSlot = (player) => {
         const slot = determineSlot(player);
-        if (!slot) {
-            toast.error("No available slot for this player");
-            return;
-        }
+        if (!slot) return toast.error("No available slot");
 
-        const alreadyAssigned = Object.values(slots)
-            .flat()
-            .some(p => p.player_name === player.player_name);
-        if (alreadyAssigned) return;
+        if (Object.values(slots).flat().some(p => p.player_name === player.player_name)) return;
 
         setSlots(prev => ({
             ...prev,
@@ -130,8 +110,6 @@ export default function MyRoster() {
     };
 
     const handleSubmit = async () => {
-        if (!selectedName) return toast.error("Select your name!");
-
         const payload = Object.entries(slots).flatMap(([slot, players]) =>
             players.map(p => ({
                 name: selectedName,
@@ -143,151 +121,132 @@ export default function MyRoster() {
             }))
         );
 
-        if (!payload.length) {
-            return toast.error("No players selected for this round");
-        }
+        if (!payload.length) return toast.error("No players selected");
 
-        try {
-            await axios.post("/api/startingrosters", payload);
+        await axios.post("/api/startingrosters", payload);
+        toast.success(`Round ${selectedRound} roster submitted!`);
 
-            toast.success(`Round ${selectedRound} roster submitted!`);
-
-            // Optional: clear slots so user sees it's "done"
-            setSlots({ QB: [], RB: [], WR: [], SUPERFLEX: [] });
-
-            // Redirect to scoreboard after short delay
-            setTimeout(() => {
-                navigate("/scoreboard");
-            }, 1200);
-        } catch (err) {
-            console.error(err);
-            toast.error("Error submitting roster");
-        }
+        setSlots({ QB: [], RB: [], WR: [], SUPERFLEX: [] });
+        setTimeout(() => navigate("/scoreboard"), 1200);
     };
 
-    const navigate = useNavigate();
+    /* Reset auth on name change */
+    const handleNameChange = (e) => {
+        setSelectedName(e.target.value);
+        setPassword("");
+        setAuthenticated(false);
+        setAuthError(false);
+        setAvailablePlayers([]);
+    };
 
     return (
         <div style={{ padding: "16px" }}>
-            {/* Name & Round Selection */}
+            {/* Name + Password */}
             <div style={{ marginBottom: "16px" }}>
-                <label>
-                    Name:{" "}
-                    <select
-                        value={selectedName}
-                        onChange={e => setSelectedName(e.target.value)}
-                    >
-                        <option value="">-- Select Name --</option>
-                        {names.map(n => (
-                            <option key={n.id} value={n.name}>
-                                {n.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label style={{ marginLeft: "16px" }}>
-                    Round:{" "}
-                    <select
-                        value={selectedRound}
-                        onChange={e => setSelectedRound(e.target.value)}
-                    >
-                        <option value="1">Round 1</option>
-                        <option value="2">Round 2</option>
-                        <option value="3">Round 3</option>
-                        <option value="4">Round 4</option>
-                    </select>
-                </label>
-            </div>
-
-            {/* Available Players */}
-            <div style={{ marginBottom: "16px" }}>
-                <h4>Available Players</h4>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                    {availablePlayers.map(player => {
-                        const isAssigned = Object.values(slots)
-                            .flat()
-                            .some(p => p.player_name === player.player_name);
-
-                        const colors =
-                            positionColors[player.position] ||
-                            positionColors.default;
-
-                        return (
-                            <div
-                                key={player.player_name}
-                                onClick={() => addToSlot(player)}
-                                style={{
-                                    padding: "4px 8px",
-                                    borderRadius: "6px",
-                                    cursor: isAssigned ? "not-allowed" : "pointer",
-                                    opacity: isAssigned ? 0.5 : 1,
-                                    backgroundColor: colors.bg,
-                                    color: colors.text,
-                                    border: `1px solid ${colors.text}`,
-                                }}
-                            >
-                                {player.player_name} ({player.team} / {player.position})
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Roster Slots */}
-            <div style={{ marginBottom: "16px" }}>
-                <h4>Roster Slots</h4>
-                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                    {Object.entries(slots).map(([slot, players]) => (
-                        <div key={slot} style={{ flex: 1, minWidth: "120px" }}>
-                            <h5>{slot} (limit: {ROUND_RULES[selectedRound][slot]})</h5>
-                            <ul style={{ padding: 0, listStyle: "none" }}>
-                                {players.map(p => {
-                                    const colors =
-                                        positionColors[p.position] ||
-                                        positionColors.default;
-
-                                    return (
-                                        <li
-                                            key={p.player_name}
-                                            style={{
-                                                marginBottom: "4px",
-                                                backgroundColor: colors.bg,
-                                                color: colors.text,
-                                                padding: "4px",
-                                                borderRadius: "4px",
-                                                display: "flex",
-                                                justifyContent: "space-between",
-                                            }}
-                                        >
-                                            {p.player_name}
-                                            <button
-                                                onClick={() => removeFromSlot(p, slot)}
-                                                style={{ marginLeft: "4px" }}
-                                            >
-                                                ✕
-                                            </button>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
+                <select value={selectedName} onChange={handleNameChange}>
+                    <option value="">-- Select Name --</option>
+                    {names.map(n => (
+                        <option key={n.id} value={n.name}>{n.name}</option>
                     ))}
-                </div>
+                </select>
+
+                {selectedName && !authenticated && (
+                    <>
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            style={{ marginLeft: "8px" }}
+                        />
+                        <button onClick={handleVerify} style={{ marginLeft: "8px" }}>
+                            Submit
+                        </button>
+                    </>
+                )}
+
+                {authError && (
+                    <div style={{ color: "red", marginTop: "6px" }}>
+                        Incorrect password
+                    </div>
+                )}
             </div>
 
-            <button
-                onClick={handleSubmit}
-                style={{
-                    padding: "8px 16px",
-                    borderRadius: "6px",
-                    backgroundColor: "#4f46e5",
-                    color: "#fff",
-                    border: "none",
-                }}
-            >
-                Submit Roster
-            </button>
+            {/* Everything below stays EXACTLY the same */}
+            {authenticated && (
+                <>
+                    {/* Round */}
+                    <label>
+                        Round:
+                        <select
+                            value={selectedRound}
+                            onChange={e => setSelectedRound(e.target.value)}
+                            style={{ marginLeft: "8px" }}
+                        >
+                            {[1, 2, 3, 4].map(r => (
+                                <option key={r} value={r}>Round {r}</option>
+                            ))}
+                        </select>
+                    </label>
+
+                    {/* Available Players */}
+                    <h4>Available Players</h4>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                        {availablePlayers.map(player => {
+                            const assigned = Object.values(slots).flat()
+                                .some(p => p.player_name === player.player_name);
+                            const colors = positionColors[player.position] || positionColors.default;
+
+                            return (
+                                <div
+                                    key={player.player_name}
+                                    onClick={() => !assigned && addToSlot(player)}
+                                    style={{
+                                        padding: "4px 8px",
+                                        borderRadius: "6px",
+                                        cursor: assigned ? "not-allowed" : "pointer",
+                                        opacity: assigned ? 0.5 : 1,
+                                        backgroundColor: colors.bg,
+                                        color: colors.text,
+                                        border: `1px solid ${colors.text}`,
+                                    }}
+                                >
+                                    {player.player_name} ({player.team} / {player.position})
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Slots */}
+                    <h4 style={{ marginTop: "16px" }}>Roster Slots</h4>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                        {Object.entries(slots).map(([slot, players]) => (
+                            <div key={slot}>
+                                <h5>{slot} (limit: {ROUND_RULES[selectedRound][slot]})</h5>
+                                {players.map(p => (
+                                    <div key={p.player_name}>
+                                        {p.player_name}
+                                        <button onClick={() => removeFromSlot(p, slot)}>✕</button>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+
+                    <button
+                        onClick={handleSubmit}
+                        style={{
+                            marginTop: "16px",
+                            padding: "8px 16px",
+                            background: "#4f46e5",
+                            color: "#fff",
+                            border: "none",
+                        }}
+                    >
+                        Submit Roster
+                    </button>
+                </>
+            )}
         </div>
     );
 }

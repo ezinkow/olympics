@@ -9,6 +9,7 @@ import Form from 'react-bootstrap/Form';
 export default function NameSubmit() {
     const [real_name, setReal_name] = useState('')
     const [name, setName] = useState('')
+    const [password, setPassword] = useState('')
     const [email_address, setEmail_address] = useState('')
     const [phone, setPhone] = useState('')
     const [email_opt_in, setEmail_opt_in] = useState(false)
@@ -17,11 +18,15 @@ export default function NameSubmit() {
 
     const handleRealNameChange = event => {
         setReal_name(event.target.value)
-        console.log(name)
+        console.log(real_name)
     }
     const handleNameChange = event => {
         setName(event.target.value)
-        console.log(real_name)
+        console.log(name)
+    }
+    const handlePasswordChange = event => {
+        setPassword(event.target.value)
+        console.log(password)
     }
     const handleEmail_addressChange = event => {
         setEmail_address(event.target.value)
@@ -83,6 +88,10 @@ export default function NameSubmit() {
                     <Form.Group onChange={handleNameChange} type="text" id="name" value={name} className="mb-3" controlId="formBasicName">
                         <Form.Label>Username:</Form.Label>
                         <Form.Control size="lg" type="name" placeholder="Enter Name You'll Select All Playoffs" />
+                    </Form.Group>
+                    <Form.Group onChange={handlePasswordChange} type="text" id="password" value={password} classPassword="mb-3" controlId="formBasicPassword">
+                        <Form.Label>Password (Use a SIMPLE password, there are no requirements):</Form.Label>
+                        <Form.Control size="lg" type="password" placeholder="Enter a SIMPLE password. Do NOT use your normal password, there is no password encryption" />
                     </Form.Group>
                     <Form.Group onChange={handleEmail_addressChange} type="text" id="email_address" value={email_address} className="mb-3" controlId="formPlaintextEmail">
                         <Form.Label>Email address</Form.Label>
