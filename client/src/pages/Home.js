@@ -11,7 +11,7 @@ export default function Home() {
         <div className="hero-content">
           <h1>🏈 NFL Playoff Pool</h1>
           <p>
-            Build your roster. Survive each round.  
+            Build your roster. Start your guys.  
             Most points wins.
           </p>
 
