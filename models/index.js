@@ -10,19 +10,14 @@ const db = {};
 
 let sequelize;
 
-console.log('ENV:', process.env.NODE_ENV);
-console.log('DIALECT:', config.dialect);
+console.log('ENV:', env);
+console.log('DIALECT:', config.dialect || 'using DATABASE_URL');
 
 if (config.use_env_variable) {
-  const dbUrl = process.env[config.use_env_variable];
-  if (!dbUrl) {
-    throw new Error(
-      `Environment variable ${config.use_env_variable} is not set!`
-    );
-  }
-  sequelize = new Sequelize(dbUrl, config);
+  // Production or DATABASE_URL environment variable
+  sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  // fallback for local dev
+  // Local development
   sequelize = new Sequelize(
     config.database,
     config.username,
@@ -31,6 +26,7 @@ if (config.use_env_variable) {
   );
 }
 
+// Load all models in this folder
 fs.readdirSync(__dirname)
   .filter(file => file !== basename && file.endsWith('.js'))
   .forEach(file => {
@@ -41,6 +37,7 @@ fs.readdirSync(__dirname)
     db[model.name] = model;
   });
 
+// Call associate if defined
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
