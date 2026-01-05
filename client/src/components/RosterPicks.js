@@ -14,6 +14,7 @@ export default function RosterPicks() {
   const [authenticated, setAuthenticated] = useState(false);
   const [names, setNames] = useState([]);
   const [sortMode, setSortMode] = useState("name"); // "name" | "position"
+  const [showSteps, setShowSteps] = useState(true);
 
   const positionColors = {
     QB: { bg: "#fee2e2", text: "#991b1b", border: "#ef4444" },
@@ -73,23 +74,35 @@ export default function RosterPicks() {
   const positionOrder = { QB: 1, RB: 2, WR: 3, TE: 4 };
 
   const sortPlayers = (players) => {
-    if (sortMode === "position") {
-      return [...players].sort((a, b) => {
-        const posDiff =
-          (positionOrder[a.position] || 99) -
-          (positionOrder[b.position] || 99);
+    const list = [...players];
 
-        if (posDiff !== 0) return posDiff;
+    switch (sortMode) {
+      case "position":
+        return list.sort((a, b) => {
+          const posDiff =
+            (positionOrder[a.position] || 99) -
+            (positionOrder[b.position] || 99);
 
-        // secondary sort A–Z within position
-        return a.player_name.localeCompare(b.player_name);
-      });
+          if (posDiff !== 0) return posDiff;
+
+          return a.player_name.localeCompare(b.player_name);
+        });
+
+      case "team":
+        return list.sort((a, b) => {
+          const teamDiff = (a.team || "").localeCompare(b.team || "");
+          if (teamDiff !== 0) return teamDiff;
+
+          // secondary sort A–Z by name
+          return a.player_name.localeCompare(b.player_name);
+        });
+
+      case "name":
+      default:
+        return list.sort((a, b) =>
+          a.player_name.localeCompare(b.player_name)
+        );
     }
-
-    // default: alphabetical
-    return [...players].sort((a, b) =>
-      a.player_name.localeCompare(b.player_name)
-    );
   };
 
   const handleNameSelect = (event) => {
@@ -162,6 +175,11 @@ export default function RosterPicks() {
     });
   };
 
+  const handleVerifySubmit = (e) => {
+    e.preventDefault(); // prevent page reload
+    handleVerifyPassword();
+  };
+
   const handleSubmitClick = async () => {
     if (!authenticated) return toast.error("Please verify your password first!");
     if (!name || name === "SELECT YOUR NAME IN DROPDOWN!") return;
@@ -207,44 +225,103 @@ export default function RosterPicks() {
   return (
     <div style={{ padding: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
       <Toaster />
-      <Roster_Selection_Steps />
+      <div
+        style={{
+          border: "1px solid #d1d5db",
+          borderRadius: "8px",
+          padding: "8px",
+          backgroundColor: "#f9fafb",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+          onClick={() => setShowSteps((prev) => !prev)}
+        >
+          <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "600" }}>
+            Roster Selection Steps
+          </h3>
+
+          <span style={{ fontSize: "14px", color: "#4f46e5" }}>
+            {showSteps ? "Hide ▲" : "Show ▼"}
+          </span>
+        </div>
+
+        {showSteps && (
+          <div style={{ marginTop: "8px" }}>
+            <Roster_Selection_Steps />
+          </div>
+        )}
+      </div>
 
       <h4>Name: {name}</h4>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <DropdownButton id="dropdown-basic-button" title="Select Name" onSelect={handleNameSelect}>
-          {namesList}
-        </DropdownButton>
 
-        <input
-          type="password"
-          placeholder="Enter password"
-          value={password}
-          onChange={handlePasswordChange}
-          style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #ccc" }}
-        />
-        <Button onClick={handleVerifyPassword} style={{ padding: "6px 12px" }}>
-          Verify
-        </Button>
-      </div>
+      {!authenticated && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleVerifyPassword();
+          }}
+          style={{ display: "flex", alignItems: "center", gap: "8px" }}
+        >
+          <DropdownButton
+            id="dropdown-basic-button"
+            title="Select Name"
+            onSelect={handleNameSelect}
+          >
+            {namesList}
+          </DropdownButton>
+
+          <input
+            type="password"
+            placeholder="Enter password"
+            value={password}
+            onChange={handlePasswordChange}
+            style={{
+              padding: "4px 8px",
+              borderRadius: "6px",
+              border: "1px solid #ccc",
+            }}
+          />
+
+          <Button type="submit" style={{ padding: "6px 12px" }}>
+            Verify
+          </Button>
+        </form>
+      )}
 
       {authenticated && (
         <>
           <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
-            <Button
-              size="sm"
-              variant={sortMode === "name" ? "primary" : "outline-primary"}
-              onClick={() => setSortMode("name")}
-            >
-              Sort A–Z
-            </Button>
+            <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+              <Button
+                size="sm"
+                variant={sortMode === "name" ? "primary" : "outline-primary"}
+                onClick={() => setSortMode("name")}
+              >
+                Sort A–Z
+              </Button>
 
-            <Button
-              size="sm"
-              variant={sortMode === "position" ? "primary" : "outline-primary"}
-              onClick={() => setSortMode("position")}
-            >
-              Sort by Position
-            </Button>
+              <Button
+                size="sm"
+                variant={sortMode === "position" ? "primary" : "outline-primary"}
+                onClick={() => setSortMode("position")}
+              >
+                Sort by Position
+              </Button>
+
+              <Button
+                size="sm"
+                variant={sortMode === "team" ? "primary" : "outline-primary"}
+                onClick={() => setSortMode("team")}
+              >
+                Sort by Team
+              </Button>
+            </div>
           </div>
           {/* Player Columns (vertical) */}
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "12px" }}>

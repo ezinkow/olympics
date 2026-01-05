@@ -53,4 +53,33 @@ module.exports = function (app) {
       res.status(500).json({ error: "Failed to load scoreboard" });
     }
   });
+
+  app.post("/api/startingrosters", async (req, res) => {
+    try {
+      const rows = req.body;
+
+      if (!Array.isArray(rows) || !rows.length) {
+        return res.status(400).json({ error: "Invalid roster payload" });
+      }
+
+      // Optional: clear existing roster for this user + round
+      const { name, round } = rows[0];
+
+      await StartingRosters.destroy({
+        where: { name, round },
+      });
+
+      // Insert new roster
+      await StartingRosters.bulkCreate(rows);
+
+      // Clear cache so scoreboard updates
+      cachedData = null;
+      lastFetch = 0;
+
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Starting roster submit failed:", err);
+      res.status(500).json({ error: "Failed to submit roster" });
+    }
+  });
 };
