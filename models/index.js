@@ -14,8 +14,15 @@ console.log('ENV:', process.env.NODE_ENV);
 console.log('DIALECT:', config.dialect);
 
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  const dbUrl = process.env[config.use_env_variable];
+  if (!dbUrl) {
+    throw new Error(
+      `Environment variable ${config.use_env_variable} is not set!`
+    );
+  }
+  sequelize = new Sequelize(dbUrl, config);
 } else {
+  // fallback for local dev
   sequelize = new Sequelize(
     config.database,
     config.username,
