@@ -44,30 +44,49 @@ export default function Rules() {
                 </li>
             </ol>
 
-            <div
-                style={{
-                    borderTop: "1px dashed #e5e7eb",
-                    paddingTop: "16px",
-                }}
-            >
-                <h4 style={{ fontWeight: 700, marginBottom: "8px" }}>
-                    📊 Scoring Rules
-                </h4>
+            <div style={{ display: "flex", gap: "32px", marginTop: "16px", alignItems: "flex-start" }}>
+                {/* Scoring Rules */}
+                <div style={{ flex: 1 }}>
+                    <h4 style={{ fontWeight: 700, marginBottom: "8px" }}>
+                        📊 Scoring Rules
+                    </h4>
 
-                <ul style={{ paddingLeft: "18px" }}>
-                    <li>
-                        <strong>Passing:</strong> 1 yard = 0.04 pts · TD = 4 pts · Interception thrown = -1 pt
-                    </li>
-                    <li>
-                        <strong>Rushing / Receiving:</strong> 1 yard = 0.1 pts · TD = 6 pts ·
-                        Reception = 1 pt
-                    </li>
-                    <li>
-                        <strong>Miscellaneous:</strong> Fumble lost = -2 pts · 2-point conversion = 2 pts</li>
-                    <li><strong>Superflex</strong> = QB/WR/RB/TE</li>
-                    <li><strong>TE</strong> = WR</li>
-                </ul>
+                    <ul style={{ paddingLeft: "18px" }}>
+                        <li>
+                            <strong>Passing:</strong> 1 yard = 0.04 pts · TD = 4 pts · Interception thrown = -1 pt
+                        </li>
+                        <li>
+                            <strong>Rushing / Receiving:</strong> 1 yard = 0.1 pts · TD = 6 pts · Reception = 1 pt
+                        </li>
+                        <li>
+                            <strong>Miscellaneous:</strong> Fumble lost = -2 pts · 2-point conversion = 2 pts
+                        </li>
+                        <li><strong>Superflex</strong> = QB/WR/RB/TE</li>
+                        <li><strong>TE</strong> = WR</li>
+                    </ul>
+                </div>
+
+                {/* Round-by-Round Starting Rosters */}
+                <div style={{ flex: 1, borderTop: "1px dashed #e5e7eb", paddingTop: "16px" }}>
+                    <h4 style={{ fontWeight: 700, marginBottom: "8px" }}>
+                        📋 Round-by-Round Starting Rosters
+                    </h4>
+
+                    <ul style={{ paddingLeft: "18px" }}>
+                        <li>
+                            <strong>Wild-Card:</strong> 1 QB, 2 RB, 3 WR, 2 SUPERFLEX
+                        </li>
+                        <li>
+                            <strong>Divisional Round:</strong> 1 QB, 1 RB, 2 WR, 2 SUPERFLEX
+                        </li>
+                        <li>
+                            <strong>Conference Championship:</strong> 1 RB, 1 WR, 4 SUPERFLEX
+                        </li>
+                        <li><strong>Super Bowl:</strong> 4 SUPERFLEX</li>
+                    </ul>
+                </div>
             </div>
+
         </div>
     )
 }

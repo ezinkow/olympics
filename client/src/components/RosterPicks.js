@@ -24,7 +24,7 @@ export default function RosterPicks() {
     default: { bg: "#f3f4f6", text: "#1f2937", border: "#d1d5db" },
   };
 
-  const tierLimits = { 1: 2, 2: 3, 3: 2, 4: 4, 5: 2, 6: 1 };
+  const tierLimits = { 1: 3, 2: 3, 3: 3, 4: 2, 5: 2, 6: 1 };
 
   // Fetch players grouped by tier, alphabetically
   useEffect(() => {
