@@ -291,78 +291,129 @@ export default function RosterPicks({ authInfo }) {
       {/* Player Columns */}
       {authenticated && (
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "12px" }}>
-          {Object.entries(playerpool).map(([tier, players]) => (
-            <div key={tier} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <h3 style={{ fontSize: "16px", fontWeight: "bold" }}>
-                Tier {tier} (Pick {tierLimits[tier] || "—"})
-              </h3>
-              {sortPlayers(players).map((player) => {
-                const tierSelected = selectedPlayers[tier] || [];
-                const isSelected = tierSelected.includes(player.player_name);
-                const allSelectedPlayers = Object.values(selectedPlayers).flat();
-                const qbCount = allSelectedPlayers
-                  .map((p) => Object.values(playerpool).flat().find((pl) => pl.player_name === p))
-                  .filter((p) => p?.position === "QB").length;
+          {Object.entries(playerpool).map(([tier, players]) => {
+            const tierSelected = selectedPlayers[tier] || [];
+            const selectedCount = tierSelected.length;
+            return (
+              <div key={tier} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: "bold" }}>
+                  Tier {tier} — Pick {selectedCount} of {tierLimits[tier] || "—"}
+                </h3>
+                {sortPlayers(players).map((player) => {
+                  const isSelected = tierSelected.includes(player.player_name);
+                  const allSelectedPlayers = Object.values(selectedPlayers).flat();
+                  const qbCount = allSelectedPlayers
+                    .map((p) => Object.values(playerpool).flat().find((pl) => pl.player_name === p))
+                    .filter((p) => p?.position === "QB").length;
 
-                const disableCheckbox = !isSelected && (
-                  tierSelected.length >= (tierLimits[tier] || 99) ||
-                  (player.position === "QB" && qbCount >= 2)
-                );
+                  const disableCheckbox = !isSelected && (
+                    tierSelected.length >= (tierLimits[tier] || 99) ||
+                    (player.position === "QB" && qbCount >= 2)
+                  );
 
-                const colors = positionColors[player.position] || positionColors.default;
+                  const colors = positionColors[player.position] || positionColors.default;
 
-                return (
-                  <label
-                    key={player.player_name}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      border: `1px solid ${isSelected ? colors.border : "#ccc"}`,
-                      backgroundColor: isSelected ? colors.bg : "#fff",
-                      borderRadius: "8px",
-                      padding: "4px",
-                      cursor: disableCheckbox ? "not-allowed" : "pointer",
-                      opacity: disableCheckbox ? 0.5 : 1,
-                      fontSize: "12px",
-                      color: colors.text,
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      disabled={disableCheckbox}
-                      onChange={() => handlePlayerSelect(tier, player.player_name)}
-                      style={{ marginRight: "6px", width: "16px", height: "16px" }}
-                    />
-                    <div>
-                      <span style={{ fontWeight: "500" }}>{player.player_name}</span>
-                      <span style={{ color: "#555", marginLeft: "4px" }}>
-                        ({player.team} / {player.position})
-                      </span>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-          ))}
+                  return (
+                    <label
+                      key={player.player_name}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        border: `1px solid ${isSelected ? colors.border : "#ccc"}`,
+                        backgroundColor: isSelected ? colors.bg : "#fff",
+                        borderRadius: "8px",
+                        padding: "4px",
+                        cursor: disableCheckbox ? "not-allowed" : "pointer",
+                        opacity: disableCheckbox ? 0.5 : 1,
+                        fontSize: "12px",
+                        color: colors.text,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        disabled={disableCheckbox}
+                        onChange={() => handlePlayerSelect(tier, player.player_name)}
+                        style={{ marginRight: "6px", width: "16px", height: "16px" }}
+                      />
+                      <div>
+                        <span style={{ fontWeight: "500" }}>{player.player_name}</span>
+                        <span style={{ color: "#555", marginLeft: "4px" }}>
+                          ({player.team} / {player.position})
+                        </span>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
       )}
 
+      {/* --- LIVE ROSTER GROUPED BY POSITION --- */}
+      {authenticated && (
+        <div style={{ marginTop: "24px", borderTop: "1px solid #d1d5db", paddingTop: "16px" }}>
+          <h3 style={{ fontSize: "16px", fontWeight: "600" }}>Your Live Roster</h3>
+          {getTotalSelectedCount() === 0 ? (
+            <p>No players selected yet.</p>
+          ) : (
+            ["QB", "RB", "WR", "TE"].map((pos) => {
+              const playersOfPos = Object.values(selectedPlayers)
+                .flat()
+                .map((playerName) => Object.values(playerpool).flat().find((p) => p.player_name === playerName))
+                .filter((p) => p?.position === pos);
+
+              if (playersOfPos.length === 0) return null;
+
+              return (
+                <div key={pos} style={{ marginBottom: "12px" }}>
+                  <strong>{pos}s:</strong>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "4px" }}>
+                    {playersOfPos.map((player) => {
+                      const colors = positionColors[player.position] || positionColors.default;
+                      const tier = Object.entries(selectedPlayers).find(([tier, arr]) => arr.includes(player.player_name))?.[0];
+                      return (
+                        <div
+                          key={player.player_name}
+                          style={{
+                            border: `1px solid ${colors.border}`,
+                            backgroundColor: colors.bg,
+                            color: colors.text,
+                            borderRadius: "8px",
+                            padding: "4px 8px",
+                            fontSize: "12px",
+                          }}
+                        >
+                          {player.player_name} ({player.team}) — Tier {tier}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+      
       {/* Submit Button */}
-      <Button
-        onClick={handleSubmitClick}
-        disabled={!authenticated || !isRosterValid}
-        style={{
-          marginTop: "16px",
-          padding: "8px 16px",
-          backgroundColor: authenticated && isRosterValid ? "#4f46e5" : "#ccc",
-          color: "#fff",
-          borderRadius: "8px",
-          cursor: authenticated && isRosterValid ? "pointer" : "not-allowed",
-        }}
-      >
-        Submit Roster
-      </Button>
+      {authenticated && (
+        <Button
+          onClick={handleSubmitClick}
+          disabled={!isRosterValid}
+          style={{
+            marginTop: "16px",
+            padding: "8px 16px",
+            backgroundColor: isRosterValid ? "#4f46e5" : "#ccc",
+            color: "#fff",
+            borderRadius: "8px",
+            cursor: isRosterValid ? "pointer" : "not-allowed",
+          }}
+        >
+          Submit Roster
+        </Button>
+      )}
     </div>
   );
 }

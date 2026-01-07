@@ -5,7 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 const ROUND_RULES = {
   1: { QB: 1, RB: 2, WR: 3, SUPERFLEX: 2 },
   2: { QB: 1, RB: 1, WR: 2, SUPERFLEX: 2 },
-  3: { QB: 0, RB: 1, WR: 1, SUPERFLEX: 4 },
+  3: { QB: 0, RB: 1, WR: 1, SUPERFLEX: 3 },
   4: { QB: 0, RB: 0, WR: 0, SUPERFLEX: 4 },
 };
 
