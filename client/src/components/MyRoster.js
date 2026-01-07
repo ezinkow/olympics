@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const ROUND_RULES = {
   1: { QB: 1, RB: 2, WR: 3, SUPERFLEX: 2 },
@@ -29,12 +30,13 @@ export default function MyRoster() {
   const [selectedName, setSelectedName] = useState("");
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
-  const [roster, setRoster] = useState([]);
-  const [availablePlayers, setAvailablePlayers] = useState([]);
   const [slots, setSlots] = useState({ QB: [], RB: [], WR: [], SUPERFLEX: [] });
+  const [availablePlayers, setAvailablePlayers] = useState([]);
   const [selectedRound, setSelectedRound] = useState(1);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [authError, setAuthError] = useState(false);
 
-  // Fetch names on mount
+  /* -------------------- FETCH NAMES -------------------- */
   useEffect(() => {
     async function fetchNames() {
       try {
@@ -47,9 +49,11 @@ export default function MyRoster() {
     fetchNames();
   }, []);
 
-  // Verify password
+  /* -------------------- VERIFY PASSWORD -------------------- */
   const handleVerify = async () => {
     if (!selectedName || !password) return;
+
+    setAuthError(false);
 
     try {
       const res = await axios.post("/api/names/verify", {
@@ -59,17 +63,21 @@ export default function MyRoster() {
 
       if (res.data.success) {
         setAuthenticated(true);
+        toast.success("Password verified!");
 
         // Fetch roster
         const rosterRes = await axios.get("/api/startingrosters/my", {
           params: { name: selectedName, round: selectedRound },
         });
-        setRoster(rosterRes.data);
 
-        // Group into slots
         const grouped = { QB: [], RB: [], WR: [], SUPERFLEX: [] };
         rosterRes.data.forEach((p) => grouped[p.slot].push(p));
         setSlots(grouped);
+
+        if (firstLoad && rosterRes.data.length) {
+          toast("Editing existing roster");
+          setFirstLoad(false);
+        }
 
         // Fetch available players
         const playersRes = await axios.get("/api/rosters/getmyroster", {
@@ -78,22 +86,22 @@ export default function MyRoster() {
         setAvailablePlayers(playersRes.data);
       } else {
         setAuthenticated(false);
-        setRoster([]);
         setSlots({ QB: [], RB: [], WR: [], SUPERFLEX: [] });
         setAvailablePlayers([]);
-        alert("Incorrect password");
+        setAuthError(true);
+        toast.error("Incorrect password");
       }
     } catch (err) {
       console.error(err);
       setAuthenticated(false);
-      setRoster([]);
       setSlots({ QB: [], RB: [], WR: [], SUPERFLEX: [] });
       setAvailablePlayers([]);
-      alert("Verification failed");
+      setAuthError(true);
+      toast.error("Password verification failed");
     }
   };
 
-  // Handle adding/removing players
+  /* -------------------- SLOT LOGIC -------------------- */
   const determineSlot = (player) => {
     const rules = ROUND_RULES[selectedRound];
     if (player.position === "QB" && slots.QB.length < rules.QB) return "QB";
@@ -105,8 +113,9 @@ export default function MyRoster() {
 
   const addToSlot = (player) => {
     const slot = determineSlot(player);
-    if (!slot) return alert("No available slot");
-    if (Object.values(slots).flat().some((p) => p.player_name === player.player_name)) return alert("Player already in roster");
+    if (!slot) return toast.error("No available slot");
+    if (Object.values(slots).flat().some((p) => p.player_name === player.player_name))
+      return toast.error("Player already in your roster");
     setSlots((prev) => ({ ...prev, [slot]: [...prev[slot], player] }));
   };
 
@@ -114,7 +123,7 @@ export default function MyRoster() {
     setSlots((prev) => ({ ...prev, [slot]: prev[slot].filter((p) => p.player_name !== player.player_name) }));
   };
 
-  // Submit roster
+  /* -------------------- SUBMIT ROSTER -------------------- */
   const isLocked = ROUND_DEADLINES[selectedRound] && new Date() > ROUND_DEADLINES[selectedRound];
 
   const isComplete = () => {
@@ -128,7 +137,8 @@ export default function MyRoster() {
   };
 
   const handleSubmit = async () => {
-    if (isLocked) return alert("Roster is locked for this round");
+    if (isLocked) return toast.error("Roster is locked for this round");
+
     const payload = Object.entries(slots).flatMap(([slot, players]) =>
       players.map((p) => ({
         name: selectedName,
@@ -139,19 +149,22 @@ export default function MyRoster() {
         slot,
       }))
     );
-    if (!payload.length) return alert("No players selected");
+
+    if (!payload.length) return toast.error("No players selected");
 
     try {
       await axios.put("/api/startingrosters", payload);
-      alert("Roster saved!");
+      toast.success("Roster saved!");
     } catch (err) {
       console.error(err);
-      alert("Submission failed");
+      toast.error("Roster submission failed");
     }
   };
 
   return (
     <div style={{ padding: "16px" }}>
+      <Toaster />
+
       <h1>My Roster</h1>
 
       {/* Name + Password */}
@@ -164,9 +177,10 @@ export default function MyRoster() {
               setSelectedName(e.target.value);
               setPassword("");
               setAuthenticated(false);
-              setRoster([]);
               setSlots({ QB: [], RB: [], WR: [], SUPERFLEX: [] });
               setAvailablePlayers([]);
+              setFirstLoad(true);
+              setAuthError(false);
             }}
           >
             <option value="">-- Select Name --</option>
@@ -179,19 +193,20 @@ export default function MyRoster() {
         </label>
 
         {selectedName && !authenticated && (
-          <div style={{ marginTop: "8px" }}>
+          <div style={{ marginTop: "8px", display: "flex", alignItems: "center", gap: "8px" }}>
             <input
               type="password"
               placeholder="Password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleVerify()}
             />
-            <button onClick={handleVerify} style={{ marginLeft: "8px" }}>
-              Submit
-            </button>
+            <button onClick={handleVerify}>Submit</button>
           </div>
         )}
+
+        {authError && <div style={{ color: "red", marginTop: "6px" }}>Incorrect password</div>}
       </div>
 
       {/* Roster UI */}

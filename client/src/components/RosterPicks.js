@@ -6,14 +6,14 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Roster_Selection_Steps from "./RosterSelectionSteps";
 
-export default function RosterPicks() {
+export default function RosterPicks({ authInfo }) {
   const [playerpool, setPlayerpool] = useState({});
   const [selectedPlayers, setSelectedPlayers] = useState({});
-  const [name, setName] = useState("SELECT YOUR NAME IN DROPDOWN!");
+  const [name, setName] = useState(authInfo?.name || "SELECT YOUR NAME IN DROPDOWN!");
   const [password, setPassword] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
+  const [authenticated, setAuthenticated] = useState(!!authInfo);
   const [names, setNames] = useState([]);
-  const [sortMode, setSortMode] = useState("name");
+  const [sortBy, setSortBy] = useState("alphabetical");
   const [showSteps, setShowSteps] = useState(true);
 
   const positionColors = {
@@ -28,7 +28,7 @@ export default function RosterPicks() {
 
   /* -------------------- DATA FETCH -------------------- */
   useEffect(() => {
-    const fetchPlayers = async () => {
+    async function fetchPlayers() {
       try {
         const res = await axios.get("/api/playerpools");
         const grouped = res.data.reduce((acc, p) => {
@@ -44,19 +44,19 @@ export default function RosterPicks() {
       } catch (err) {
         console.error(err);
       }
-    };
+    }
     fetchPlayers();
   }, []);
 
   useEffect(() => {
-    const fetchNames = async () => {
+    async function fetchNames() {
       try {
         const res = await axios.get("/api/names");
         setNames(res.data.sort((a, b) => a.name.localeCompare(b.name)));
       } catch (err) {
         console.error(err);
       }
-    };
+    }
     fetchNames();
   }, []);
 
@@ -69,24 +69,81 @@ export default function RosterPicks() {
   const positionOrder = { QB: 1, RB: 2, WR: 3, TE: 4 };
   const sortPlayers = (players) => {
     const list = [...players];
-    switch (sortMode) {
+    switch (sortBy) {
       case "position":
         return list.sort((a, b) => {
-          const posDiff =
-            (positionOrder[a.position] || 99) - (positionOrder[b.position] || 99);
-          if (posDiff !== 0) return posDiff;
-          return a.player_name.localeCompare(b.player_name);
+          const posDiff = (positionOrder[a.position] || 99) - (positionOrder[b.position] || 99);
+          return posDiff !== 0 ? posDiff : a.player_name.localeCompare(b.player_name);
         });
       case "team":
         return list.sort((a, b) => {
           const teamDiff = (a.team || "").localeCompare(b.team || "");
-          if (teamDiff !== 0) return teamDiff;
-          return a.player_name.localeCompare(b.player_name);
+          return teamDiff !== 0 ? teamDiff : a.player_name.localeCompare(b.player_name);
         });
-      case "name":
+      case "alphabetical":
       default:
         return list.sort((a, b) => a.player_name.localeCompare(b.player_name));
     }
+  };
+
+  /* -------------------- HANDLERS -------------------- */
+  const handleNameSelect = (event) => {
+    setName(event);
+    setAuthenticated(false);
+    setPassword("");
+    setSelectedPlayers({});
+  };
+
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+
+  const handleVerifyPassword = async () => {
+    if (!name || name === "SELECT YOUR NAME IN DROPDOWN!") return toast.error("Please select your name");
+    if (!password) return toast.error("Please enter password");
+
+    try {
+      const res = await axios.post("/api/names/verify", { name, password });
+      if (res.data.success) {
+        setAuthenticated(true);
+        toast.success("Password verified!");
+      } else {
+        setAuthenticated(false);
+        toast.error("Incorrect password");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Verification failed");
+    }
+  };
+
+  const handlePlayerSelect = (tier, playerName) => {
+    if (!authenticated) return;
+    setSelectedPlayers((prev) => {
+      const tierSelected = prev[tier] || [];
+      const allSelectedPlayers = Object.values(prev).flat();
+      const qbCount = allSelectedPlayers
+        .map((p) => Object.values(playerpool).flat().find((pl) => pl.player_name === p))
+        .filter((p) => p?.position === "QB").length;
+
+      const playerObj = Object.values(playerpool)
+        .flat()
+        .find((p) => p.player_name === playerName);
+
+      if (!playerObj) return prev;
+      if (tierSelected.includes(playerName))
+        return { ...prev, [tier]: tierSelected.filter((p) => p !== playerName) };
+
+      if (playerObj.position === "QB" && qbCount >= 2) {
+        toast.error("You can only select 2 QBs total");
+        return prev;
+      }
+
+      if (tierSelected.length >= (tierLimits[tier] || 99)) {
+        toast.error(`Tier limit reached: ${tierLimits[tier]}`);
+        return prev;
+      }
+
+      return { ...prev, [tier]: [...tierSelected, playerName] };
+    });
   };
 
   const getTotalSelectedCount = () =>
@@ -108,79 +165,8 @@ export default function RosterPicks() {
     return true;
   };
 
-  const handleNameSelect = (event) => {
-    setName(event);
-    setAuthenticated(false);
-    setPassword("");
-    setSelectedPlayers({});
-  };
-
-  const handlePasswordChange = (e) => setPassword(e.target.value);
-
-  const handleVerifyPassword = async () => {
-    if (!name || name === "SELECT YOUR NAME IN DROPDOWN!") {
-      return toast.error("Please select your name first!");
-    }
-    if (!password) {
-      return toast.error("Please enter your password!");
-    }
-
-    try {
-      const res = await axios.post("/api/names/verify", { name, password });
-      if (res.data.success) {
-        setAuthenticated(true);
-        toast.success("Password verified! You can now select players and submit your roster.");
-      } else {
-        setAuthenticated(false);
-        toast.error("Incorrect password. Please try again.");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error verifying password. Try again.");
-    }
-  };
-
-  const handlePlayerSelect = (tier, playerName) => {
-    if (!authenticated) return;
-
-    setSelectedPlayers((prev) => {
-      const tierSelected = prev[tier] || [];
-      const allSelectedPlayers = Object.values(prev).flat();
-      const qbCount = allSelectedPlayers
-        .map((p) => Object.values(playerpool).flat().find((pl) => pl.player_name === p))
-        .filter((p) => p?.position === "QB").length;
-
-      const playerObj = Object.values(playerpool)
-        .flat()
-        .find((p) => p.player_name === playerName);
-
-      if (!playerObj) return prev;
-
-      if (tierSelected.includes(playerName)) {
-        return { ...prev, [tier]: tierSelected.filter((p) => p !== playerName) };
-      }
-
-      if (playerObj.position === "QB" && qbCount >= 2) {
-        toast.error("You can only select 2 QBs total");
-        return prev;
-      }
-
-      if (tierSelected.length >= (tierLimits[tier] || 99)) {
-        toast.error(`Tier limit reached: ${tierLimits[tier]}`);
-        return prev;
-      }
-
-      return { ...prev, [tier]: [...tierSelected, playerName] };
-    });
-  };
-
   const handleSubmitClick = async () => {
-    if (!authenticated) {
-      return toast.error("Please verify your password first!");
-    }
-    if (!name || name === "SELECT YOUR NAME IN DROPDOWN!") {
-      return toast.error("Please select your name");
-    }
+    if (!authenticated) return toast.error("Please verify your password first!");
     if (!validateRoster()) return;
 
     const allPlayersMap = Object.values(playerpool)
@@ -221,15 +207,14 @@ export default function RosterPicks() {
 
   const isRosterValid =
     getTotalSelectedCount() === 14 &&
-    Object.entries(tierLimits).every(
-      ([tier, required]) => (selectedPlayers[tier] || []).length === required
-    );
+    Object.entries(tierLimits).every(([tier, required]) => (selectedPlayers[tier] || []).length === required);
 
   /* -------------------- RENDER -------------------- */
   return (
     <div style={{ padding: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
       <Toaster />
 
+      {/* Roster Selection Steps */}
       <div
         style={{
           border: "1px solid #d1d5db",
@@ -239,30 +224,16 @@ export default function RosterPicks() {
         }}
       >
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            cursor: "pointer",
-          }}
+          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}
           onClick={() => setShowSteps((prev) => !prev)}
         >
-          <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "600" }}>
-            Roster Selection Steps
-          </h3>
-          <span style={{ fontSize: "14px", color: "#4f46e5" }}>
-            {showSteps ? "Hide ▲" : "Show ▼"}
-          </span>
+          <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "600" }}>Roster Selection Steps</h3>
+          <span style={{ fontSize: "14px", color: "#4f46e5" }}>{showSteps ? "Hide ▲" : "Show ▼"}</span>
         </div>
-        {showSteps && (
-          <div style={{ marginTop: "8px" }}>
-            <Roster_Selection_Steps />
-          </div>
-        )}
+        {showSteps && <div style={{ marginTop: "8px" }}><Roster_Selection_Steps /></div>}
       </div>
 
-      <h4>Name: {name}</h4>
-
+      {/* Name selection & password */}
       {!authenticated && (
         <form
           onSubmit={(e) => {
@@ -273,7 +244,7 @@ export default function RosterPicks() {
         >
           <DropdownButton
             id="dropdown-basic-button"
-            title="Select Name"
+            title={name}
             onSelect={handleNameSelect}
           >
             {namesList}
@@ -294,6 +265,29 @@ export default function RosterPicks() {
         </form>
       )}
 
+      {/* Sort Buttons */}
+      {authenticated && (
+        <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+          <span style={{ fontWeight: 500 }}>Sort by:</span>
+          {["alphabetical", "position", "team"].map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setSortBy(mode)}
+              style={{
+                padding: "4px 8px",
+                borderRadius: "6px",
+                border: sortBy === mode ? "2px solid #4f46e5" : "1px solid #ccc",
+                backgroundColor: sortBy === mode ? "#eef2ff" : "#fff",
+                cursor: "pointer",
+                textTransform: "capitalize",
+              }}
+            >
+              {mode.replace("alphabetical", "Alphabetical")}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Player Columns */}
       {authenticated && (
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "12px" }}>
@@ -307,9 +301,7 @@ export default function RosterPicks() {
                 const isSelected = tierSelected.includes(player.player_name);
                 const allSelectedPlayers = Object.values(selectedPlayers).flat();
                 const qbCount = allSelectedPlayers
-                  .map((p) =>
-                    Object.values(playerpool).flat().find((pl) => pl.player_name === p)
-                  )
+                  .map((p) => Object.values(playerpool).flat().find((pl) => pl.player_name === p))
                   .filter((p) => p?.position === "QB").length;
 
                 const disableCheckbox = !isSelected && (
@@ -356,6 +348,7 @@ export default function RosterPicks() {
         </div>
       )}
 
+      {/* Submit Button */}
       <Button
         onClick={handleSubmitClick}
         disabled={!authenticated || !isRosterValid}
