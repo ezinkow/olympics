@@ -46,6 +46,8 @@ module.exports = function (app) {
             res.status(500).json({ error: "Failed to fetch user's roster" });
         }
     });
+
+
     // ----------------------------------
     // POST roster (OVERWRITE SAFE)
     // ----------------------------------
@@ -77,5 +79,5 @@ module.exports = function (app) {
             console.error(err);
             res.status(500).json(err);
         }
-    })
+    });
 };
