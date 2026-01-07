@@ -1,56 +1,64 @@
-// Requiring our models
 const { Rosters } = require("../models");
-
 
 module.exports = function (app) {
 
-    // Get everything in Rosters table
-    app.get("/api/rosters", function (req, res) {
-        Rosters.findAll({})
-            .then(function (dbrosters) {
-                res.json(dbrosters)
-            })
-    });
+  // ----------------------------------
+  // GET all rosters (admin/debug)
+  // ----------------------------------
+  app.get("/api/rosters", async (req, res) => {
+    try {
+      const rows = await Rosters.findAll();
+      res.json(rows);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
 
-    // Post new rosters to rosters table
-    app.post("/api/rosters", async (req, res) => {
-        try {
-            const data = Array.isArray(req.body) ? req.body : [req.body];
+  // ----------------------------------
+  // GET roster by name (used for overwrite warning)
+  // ----------------------------------
+  app.get("/api/rosters/by-name/:name", async (req, res) => {
+    try {
+      const rows = await Rosters.findAll({
+        where: { name: req.params.name },
+        order: [["id", "ASC"]],
+      });
+      res.json(rows);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
 
-            const created = await Rosters.bulkCreate(
-                data.map(row => ({
-                    name: row.name,
-                    player_name: row.player_name,
-                    position: row.position,
-                    team: row.team,
-                    tier: row.tier
-                }))
-            );
+  // ----------------------------------
+  // POST roster (OVERWRITE SAFE)
+  // ----------------------------------
+  app.post("/api/rosters", async (req, res) => {
+    try {
+      const data = Array.isArray(req.body) ? req.body : [req.body];
+      const name = data[0]?.name;
 
-            res.json(created);
-        } catch (err) {
-            console.error(err);
-            res.status(500).json(err);
-        }
-    });
+      if (!name) {
+        return res.status(400).json({ error: "Missing name" });
+      }
 
-    // GET /api/rosters?name=elan&round=1
-    app.get("/api/rosters/getmyroster", async (req, res) => {
-        const { name } = req.query;
+      // 🔥 delete existing roster first
+      await Rosters.destroy({ where: { name } });
 
-        if (!name) {
-            return res.status(400).json({ error: "Missing name" });
-        }
+      // insert new roster
+      const created = await Rosters.bulkCreate(
+        data.map(row => ({
+          name: row.name,
+          player_name: row.player_name,
+          position: row.position,
+          team: row.team,
+          tier: row.tier,
+        }))
+      );
 
-        try {
-            const roster = await Rosters.findAll({
-                where: { name },
-                order: [["id", "ASC"]], // optional, keeps insertion order
-            });
-            res.json(roster);
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ error: "Failed to fetch roster" });
-        }
-    });
-}
+      res.json({ success: true, overwritten: true, created });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json(err);
+    }
+  });
+};

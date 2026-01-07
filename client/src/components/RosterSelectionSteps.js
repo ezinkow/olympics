@@ -80,7 +80,7 @@ export default function Rules() {
                             <strong>Divisional Round:</strong> 1 QB, 1 RB, 2 WR, 2 SUPERFLEX
                         </li>
                         <li>
-                            <strong>Conference Championship:</strong> 1 RB, 1 WR, 4 SUPERFLEX
+                            <strong>Conference Championship:</strong> 1 RB, 1 WR, 3 SUPERFLEX
                         </li>
                         <li><strong>Super Bowl:</strong> 4 SUPERFLEX</li>
                     </ul>
