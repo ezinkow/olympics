@@ -10,10 +10,17 @@ const ROUND_RULES = {
 };
 
 const ROUND_DEADLINES = {
-  1: new Date("2026-01-10T21:30:00Z"),
+  1: new Date("2026-01-10T22:00:00Z"),
   2: new Date("2026-01-17T21:30:00Z"),
   3: new Date("2026-01-25T20:00:00Z"),
   4: new Date("2026-02-08T23:30:00Z"),
+};
+
+const ROUND_LABELS = {
+  1: "Wild Card Round",
+  2: "Divisional Round",
+  3: "Conference Championship",
+  4: "Super Bowl",
 };
 
 const EMPTY_SLOTS = { QB: [], RB: [], WR: [], SUPERFLEX: [] };
