@@ -12,6 +12,7 @@ import Standings from './pages/Standings';
 import RosterPicks from './pages/RosterPicks';
 import MyRoster from './pages/MyRoster';
 import SignUp from './pages/SignUp';
+import PlayerPoolsTable from './components/PlayerPoolsTable';
 
 export default function App() {
 
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/scoreboard" element={<Scoreboard />} />
         <Route path="/myroster" element={<MyRoster />} />
         <Route path="/standings" element={<Standings />} />
+        <Route path="/playerstats" element={<PlayerPoolsTable />} />
         <Route path="/" element={<Home />} />
       </Routes>
     </Router>

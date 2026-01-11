@@ -21,6 +21,9 @@ export default function Navbar() {
           <Link to="/standings" className={isActive("/standings") ? "active" : ""}>
             Standings
           </Link>
+          <Link to="/playerstats" className={isActive("/playerstats") ? "active" : ""}>
+            Player Stats
+          </Link>
           {/* <Link to="/signup" className={isActive("/signup") ? "active" : ""}>
             Sign Up
           </Link> */}
