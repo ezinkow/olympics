@@ -4,9 +4,12 @@ import axios from "axios";
 export default function PlayerPoolsTable() {
   const [players, setPlayers] = useState([]);
 
-  useEffect(() => {
-    axios.get("/api/playerpools").then((res) => setPlayers(res.data));
-  }, []);
+useEffect(() => {
+  axios.get("/api/playerpools").then((res) => {
+    console.log("API response:", res.data);
+    setPlayers(res.data);
+  });
+}, []);
 
   return (
     <div style={{ padding: "16px" }}>

@@ -12,7 +12,7 @@ import Standings from './pages/Standings';
 import RosterPicks from './pages/RosterPicks';
 import MyRoster from './pages/MyRoster';
 import SignUp from './pages/SignUp';
-import PlayerPoolsTable from './components/PlayerPoolsTable';
+import PlayerPoolsTable from './pages/PlayerStats';
 
 export default function App() {
 

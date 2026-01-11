@@ -35,6 +35,10 @@ module.exports = function (sequelize, DataTypes) {
         super_bowl_score: {
             type: DataTypes.TEXT,
             allowNull: true,
+        },
+        times_selected: {
+            type: DataTypes.TEXT,
+            allowNull: true,
         }
         // ,
         // total_score: {
