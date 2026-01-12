@@ -34,7 +34,6 @@ export default function MyRoster() {
     const [authenticated, setAuthenticated] = useState(false);
     const [slots, setSlots] = useState(EMPTY_SLOTS);
     const [availablePlayers, setAvailablePlayers] = useState([]);
-    const [playerPoolMap, setPlayerPoolMap] = useState({});
     const [selectedRound, setSelectedRound] = useState(1);
     const [authError, setAuthError] = useState(false);
     const [verifying, setVerifying] = useState(false);
@@ -64,18 +63,17 @@ export default function MyRoster() {
             setAuthenticated(true);
             toast.success("Password verified!");
 
-            // load roster
+            // load full roster
             const rosterRes = await axios.get("/api/rosters/getmyroster", {
                 params: { name: selectedName },
             });
 
-            // load playerpools once
+            // load player pools once
             const poolsRes = await axios.get("/api/playerpools");
             const poolMap = {};
             poolsRes.data.forEach((p) => {
                 poolMap[p.player_name] = p.eliminated ?? null;
             });
-            console.log('poolmap', poolMap)
 
             // merge eliminated onto roster players
             const enriched = rosterRes.data.map((p) => ({
@@ -83,7 +81,6 @@ export default function MyRoster() {
                 eliminated: poolMap[p.player_name] ?? null,
             }));
 
-            setPlayerPoolMap(poolMap);
             setAvailablePlayers(enriched);
         } catch {
             setAuthenticated(false);
@@ -149,13 +146,57 @@ export default function MyRoster() {
         }));
     };
 
+    /* ---------------- SUBMIT ---------------- */
+    const isLocked =
+        ROUND_DEADLINES[selectedRound] &&
+        new Date() > ROUND_DEADLINES[selectedRound];
+
+    const totalPlayersSelected = () =>
+        Object.values(slots).reduce((sum, arr) => sum + arr.length, 0);
+    
+    const isComplete = () => {
+        const rules = ROUND_RULES[selectedRound];
+
+        const qbOk = slots.QB.length <= rules.QB; // QB optional
+        const rbOk = slots.RB.length === rules.RB;
+        const wrOk = slots.WR.length === rules.WR;
+        const sfOk = slots.SUPERFLEX.length === rules.SUPERFLEX;
+
+        // total players must be 5
+        const totalOk = totalPlayersSelected() === 5;
+
+        return qbOk && rbOk && wrOk && sfOk && totalOk;
+    };
+
+
+    const handleSubmit = async () => {
+        if (isLocked) return toast.error("Roster locked");
+
+        const payload = Object.entries(slots).flatMap(([slot, players]) =>
+            players.map((p) => ({
+                name: selectedName,
+                round: selectedRound,
+                player_name: p.player_name,
+                position: p.position,
+                team: p.team,
+                slot,
+            }))
+        );
+
+        try {
+            await axios.put("/api/startingrosters", payload);
+            toast.success("Roster saved!");
+        } catch {
+            toast.error("Save failed");
+        }
+    };
+
     /* ---------------- UI ---------------- */
     return (
         <div style={{ padding: 16 }}>
             <Toaster />
             <h1>My Starting Roster</h1>
 
-            {/* name select */}
             <select
                 value={selectedName}
                 onChange={(e) => {
@@ -174,7 +215,6 @@ export default function MyRoster() {
                 ))}
             </select>
 
-            {/* auth */}
             {selectedName && !authenticated && (
                 <div>
                     <input
@@ -189,10 +229,12 @@ export default function MyRoster() {
                 </div>
             )}
 
-            {/* main */}
             {authenticated && (
                 <>
-                    <select value={selectedRound} onChange={(e) => setSelectedRound(Number(e.target.value))}>
+                    <select
+                        value={selectedRound}
+                        onChange={(e) => setSelectedRound(Number(e.target.value))}
+                    >
                         {[1, 2, 3, 4].map((r) => (
                             <option key={r} value={r}>
                                 Round {r}
@@ -201,15 +243,16 @@ export default function MyRoster() {
                     </select>
 
                     <h3>Available Players</h3>
-
                     {availablePlayers
                         .filter(
                             (p) =>
                                 p.eliminated === null ||
-                                p.eliminated >= selectedRound // elimination logic
+                                p.eliminated >= selectedRound
                         )
                         .map((p) => {
-                            const used = Object.values(slots).flat().some((x) => x.player_name === p.player_name);
+                            const used = Object.values(slots)
+                                .flat()
+                                .some((x) => x.player_name === p.player_name);
                             const c = positionColors[p.position] || positionColors.default;
 
                             return (
@@ -239,11 +282,19 @@ export default function MyRoster() {
                             </strong>
                             {players.map((p) => (
                                 <div key={p.player_name}>
-                                    {p.player_name} <button onClick={() => removeFromSlot(p, slot)}>✕</button>
+                                    {p.player_name}{" "}
+                                    <button onClick={() => removeFromSlot(p, slot)}>✕</button>
                                 </div>
                             ))}
                         </div>
                     ))}
+
+                    <button
+                        disabled={!isComplete() || isLocked}
+                        onClick={handleSubmit}
+                    >
+                        {isLocked ? "Locked" : "Submit Roster"}
+                    </button>
                 </>
             )}
         </div>
