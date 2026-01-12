@@ -27,6 +27,7 @@ module.exports = function (app) {
           team: player.team,
           position: player.position,
           tier: player.tier,
+          eliminated: player.eliminated,
           times_selected: player.times_selected, // ✅ hardcoded column
           wild_card_score: wild,
           divisional_score: div,
