@@ -247,7 +247,7 @@ export default function MyRoster() {
                         .filter(
                             (p) =>
                                 p.eliminated === null ||
-                                p.eliminated >= selectedRound
+                                p.eliminated <= selectedRound
                         )
                         .map((p) => {
                             const used = Object.values(slots)
