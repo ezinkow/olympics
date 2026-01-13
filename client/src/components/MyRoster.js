@@ -74,6 +74,7 @@ export default function MyRoster() {
             poolsRes.data.forEach((p) => {
                 poolMap[p.player_name] = p.eliminated ?? null;
             });
+            console.log(poolMap)
 
             // merge eliminated onto roster players
             const enriched = rosterRes.data.map((p) => ({
@@ -153,7 +154,7 @@ export default function MyRoster() {
 
     const totalPlayersSelected = () =>
         Object.values(slots).reduce((sum, arr) => sum + arr.length, 0);
-    
+
     const isComplete = () => {
         const rules = ROUND_RULES[selectedRound];
 
@@ -243,12 +244,11 @@ export default function MyRoster() {
                     </select>
 
                     <h3>Available Players</h3>
-                    {availablePlayers
-                        .filter(
-                            (p) =>
-                                p.eliminated === null ||
-                                p.eliminated <= selectedRound
-                        )
+                    {availablePlayers.filter(
+                        (p) =>
+                            p.eliminated === null ||
+                            p.eliminated >= selectedRound
+                    )
                         .map((p) => {
                             const used = Object.values(slots)
                                 .flat()
