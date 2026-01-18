@@ -398,7 +398,7 @@ export default function RosterPicks({ authInfo }) {
       )}
       
       {/* Submit Button */}
-      {authenticated && (
+      {/* {authenticated && (
         <Button
           onClick={handleSubmitClick}
           disabled={!isRosterValid}
@@ -413,7 +413,7 @@ export default function RosterPicks({ authInfo }) {
         >
           Submit Roster
         </Button>
-      )}
+      )} */}
     </div>
   );
 }
