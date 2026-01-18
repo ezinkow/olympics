@@ -10,7 +10,7 @@ import axios from "axios";
 const ROUND_LAYOUT = {
   1: ["QB", "RB", "RB", "WR", "WR", "WR", "SUPERFLEX", "SUPERFLEX"],
   2: ["QB", "RB", "WR", "WR", "SUPERFLEX", "SUPERFLEX"],
-  3: ["RB", "WR", "SUPERFLEX", "SUPERFLEX", "SUPERFLEX", "SUPERFLEX"],
+  3: ["RB", "WR", "SUPERFLEX", "SUPERFLEX", "SUPERFLEX"],
   4: ["SUPERFLEX", "SUPERFLEX", "SUPERFLEX", "SUPERFLEX"],
 };
 
