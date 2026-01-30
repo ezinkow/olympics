@@ -45,13 +45,24 @@ export default function CountryPicks({ authInfo }) {
 
   /* -------------------- DERIVED -------------------- */
   const totalSpend = useMemo(() => {
-    return selectedCountries.reduce(
-      (sum, c) => sum + Number(c.price || 0),
-      0
+    return (
+      selectedCountries.reduce(
+        (sum, c) => sum + Math.round(Number(c.price || 0) * 100),
+        0
+      ) / 100
     );
   }, [selectedCountries]);
 
-  const remainingBudget = BUDGET_LIMIT - totalSpend;
+  const remainingBudget = useMemo(() => {
+    const remainingCents =
+      BUDGET_LIMIT * 100 -
+      selectedCountries.reduce(
+        (sum, c) => sum + Math.round(Number(c.price || 0) * 100),
+        0
+      );
+
+    return remainingCents / 100;
+  }, [selectedCountries]);
 
   const sortedCountries = useMemo(() => {
     const list = [...countries];
@@ -104,7 +115,11 @@ export default function CountryPicks({ authInfo }) {
       return;
     }
 
-    if (totalSpend + Number(country.price || 0) > BUDGET_LIMIT) {
+    const newTotal =
+      Math.round(totalSpend * 100) +
+      Math.round(Number(country.price || 0) * 100);
+
+    if (newTotal > BUDGET_LIMIT * 100) {
       toast.error(`Budget exceeded ($${BUDGET_LIMIT} max)`);
       return;
     }
@@ -117,12 +132,21 @@ export default function CountryPicks({ authInfo }) {
     toast("Selections cleared");
   };
 
+
   const handleAddWriteIn = () => {
     if (!authenticated) return;
 
     const trimmed = writeIn.trim();
     if (!trimmed) return;
 
+    const existsInPool = countries.some(
+      c => c.country_name.toLowerCase() === trimmed.toLowerCase()
+    );
+
+    if (existsInPool) {
+      toast.error("Nice try! Country already exists, select country not listed");
+      return;
+    }
     const exists = selectedCountries.some(
       (c) => c.country_name.toLowerCase() === trimmed.toLowerCase()
     );
@@ -157,6 +181,7 @@ export default function CountryPicks({ authInfo }) {
       country_name: c.country_name,
       price: c.price,
     }));
+
     try {
       await axios.post("/api/olympic-rosters", payload);
       toast.success("Countries submitted!");
@@ -233,14 +258,14 @@ export default function CountryPicks({ authInfo }) {
             }}
           >
             <strong>Budget:</strong>{" "}
-            ${Math.round(totalSpend * 10) / 10} / ${BUDGET_LIMIT}
+            ${totalSpend} / ${BUDGET_LIMIT}
             <span
               style={{
                 marginLeft: "8px",
                 color: remainingBudget < 0 ? "red" : "green",
               }}
             >
-              (${Math.round(remainingBudget * 10) / 10} remaining)
+              (${remainingBudget} remaining)
             </span>
           </div>
 
@@ -289,7 +314,8 @@ export default function CountryPicks({ authInfo }) {
 
               const disabled =
                 !isSelected &&
-                Number(country.price || 0) > remainingBudget;
+                Math.round(Number(country.price || 0) * 100) >
+                Math.round(remainingBudget * 100)
 
               return (
                 <label
@@ -332,7 +358,7 @@ export default function CountryPicks({ authInfo }) {
                     <span>🥈 {country.silver || 0}</span>
                     <span>🥉 {country.bronze || 0}</span>
                     <strong>
-                      ${Math.round(Number(country.price || 0) * 10) / 10}
+                      ${Number(country.price || 0)}
                     </strong>
                   </div>
                 </label>
@@ -389,7 +415,8 @@ export default function CountryPicks({ authInfo }) {
               selectedCountries.map((c) => (
                 <div key={c.country_name}>
                   {c.country_name} — $
-                  {Math.round(Number(c.price || 0) * 10) / 10}
+                  {Number(c.price || 0)
+                  }
                 </div>
               ))
             )}

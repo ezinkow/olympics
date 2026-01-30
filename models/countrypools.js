@@ -5,19 +5,19 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false
         },
         gold: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: true,
         },
         silver: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: true,
         },
         bronze: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: true,
         },
         price: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: true,
         },
         times_selected: {
