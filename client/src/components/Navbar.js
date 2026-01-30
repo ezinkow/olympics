@@ -27,9 +27,9 @@ export default function Navbar() {
             <Link to="/countrypicks" className={isActive("/rosterpicks") ? "active" : ""}>
               Create Roster
             </Link>
-            <Link to="/scoreboard" className={isActive("/scoreboard") ? "active" : ""}>
+            {/* <Link to="/scoreboard" className={isActive("/scoreboard") ? "active" : ""}>
               Scoreboard
-            </Link>
+            </Link> */}
             <Link to="/standings" className={isActive("/standings") ? "active" : ""}>
               Standings
             </Link>
