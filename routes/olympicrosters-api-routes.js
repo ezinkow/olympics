@@ -67,7 +67,7 @@ module.exports = function (app) {
             const created = await OlympicRosters.bulkCreate(
                 data.map(row => ({
                     name: row.name,
-                    country: row.country_name,
+                    country_name: row.country_name,
                     price: row.price,
                 }))
             );

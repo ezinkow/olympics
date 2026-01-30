@@ -157,7 +157,6 @@ export default function CountryPicks({ authInfo }) {
       country_name: c.country_name,
       price: c.price,
     }));
-
     try {
       await axios.post("/api/olympic-rosters", payload);
       toast.success("Countries submitted!");
