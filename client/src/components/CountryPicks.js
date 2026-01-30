@@ -115,6 +115,11 @@ export default function CountryPicks({ authInfo }) {
     setSelectedCountries((prev) => [...prev, country]);
   };
 
+  const handleClearSelections = () => {
+    setSelectedCountries([]);
+    toast("Selections cleared");
+  };
+
   const handleSubmit = async () => {
     if (!authenticated) return toast.error("Verify password first");
 
@@ -332,12 +337,22 @@ export default function CountryPicks({ authInfo }) {
             )}
 
             {selectedCountries.length > 0 && (
-              <Button
-                onClick={handleSubmit}
-                style={{ marginTop: "16px", width: "100%" }}
-              >
-                Submit Countries
-              </Button>
+              <>
+                <Button
+                  variant="secondary"
+                  onClick={handleClearSelections}
+                  style={{ marginTop: "8px", width: "100%" }}
+                >
+                  Clear Selections
+                </Button>
+
+                <Button
+                  onClick={handleSubmit}
+                  style={{ marginTop: "8px", width: "100%" }}
+                >
+                  Submit Countries
+                </Button>
+              </>
             )}
           </div>
         </div>
