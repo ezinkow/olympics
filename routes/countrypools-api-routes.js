@@ -12,8 +12,7 @@ module.exports = function (app) {
         const gold = Number(country.gold) || 0;
         const silver = Number(country.silver) || 0;
         const bronze = Number(country.bronze) || 0;
-
-        const price = gold * 3 + silver * 2 + bronze;
+        const price = Number(country.price) || 0;
 
         return {
           id: country.id,
