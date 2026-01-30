@@ -33,6 +33,9 @@ export default function Navbar() {
             <Link to="/standings" className={isActive("/standings") ? "active" : ""}>
               Standings
             </Link>
+            <Link to="/myroster" className={isActive("/myroster") ? "active" : ""}>
+              My Roster
+            </Link>
             <Link to="/medaltable" className={isActive("/medaltable") ? "active" : ""}>
               Medal Table
             </Link>

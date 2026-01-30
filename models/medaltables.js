@@ -1,5 +1,5 @@
 module.exports = function (sequelize, DataTypes) {
-    const PlayerStats = sequelize.define("PlayerStats", {
+    const CountryStats = sequelize.define("CountryStats", {
 
         name: { type: DataTypes.STRING, allowNull: false },
         team: DataTypes.STRING,
@@ -8,5 +8,5 @@ module.exports = function (sequelize, DataTypes) {
         round: DataTypes.INTEGER,
     });
 
-    return PlayerStats;
+    return CountryStats;
 };
