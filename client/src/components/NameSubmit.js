@@ -88,7 +88,7 @@ export default function NameSubmit() {
                     </Form.Group>
                     <Form.Group onChange={handleNameChange} type="text" id="name" value={name} className="mb-3" controlId="formBasicName">
                         <Form.Label>Username:</Form.Label>
-                        <Form.Control size="lg" type="name" placeholder="Enter Name You'll Select All Playoffs" />
+                        <Form.Control size="lg" type="name" placeholder="Enter Name You'll Select All Olympics" />
                     </Form.Group>
                     <Form.Group onChange={handlePasswordChange} type="text" id="password" value={password} classPassword="mb-3" controlId="formBasicPassword">
                         <Form.Label>Password (Use a SIMPLE password, there are no requirements):</Form.Label>
