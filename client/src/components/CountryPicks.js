@@ -6,6 +6,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 
 const BUDGET_LIMIT = 150;
+const WRITE_IN_PRICE = 1;
 
 export default function CountryPicks({ authInfo }) {
   const [countries, setCountries] = useState([]);
@@ -15,6 +16,7 @@ export default function CountryPicks({ authInfo }) {
   const [authenticated, setAuthenticated] = useState(!!authInfo);
   const [names, setNames] = useState([]);
   const [sortBy, setSortBy] = useState("price");
+  const [writeIn, setWriteIn] = useState("");
 
   /* -------------------- DATA FETCH -------------------- */
   useEffect(() => {
@@ -53,17 +55,12 @@ export default function CountryPicks({ authInfo }) {
 
   const sortedCountries = useMemo(() => {
     const list = [...countries];
-
     switch (sortBy) {
       case "price":
-        return list.sort(
-          (a, b) => Number(b.price || 0) - Number(a.price || 0)
-        );
+        return list.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
       case "name":
       default:
-        return list.sort((a, b) =>
-          a.country_name.localeCompare(b.country_name)
-        );
+        return list.sort((a, b) => a.country_name.localeCompare(b.country_name));
     }
   }, [countries, sortBy]);
 
@@ -118,6 +115,38 @@ export default function CountryPicks({ authInfo }) {
   const handleClearSelections = () => {
     setSelectedCountries([]);
     toast("Selections cleared");
+  };
+
+  const handleAddWriteIn = () => {
+    if (!authenticated) return;
+
+    const trimmed = writeIn.trim();
+    if (!trimmed) return;
+
+    const exists = selectedCountries.some(
+      (c) => c.country_name.toLowerCase() === trimmed.toLowerCase()
+    );
+
+    if (exists) {
+      toast.error("Country already selected");
+      return;
+    }
+
+    if (totalSpend + WRITE_IN_PRICE > BUDGET_LIMIT) {
+      toast.error("Budget exceeded");
+      return;
+    }
+
+    setSelectedCountries((prev) => [
+      ...prev,
+      {
+        country_name: trimmed,
+        price: WRITE_IN_PRICE,
+        writeIn: true,
+      },
+    ]);
+
+    setWriteIn("");
   };
 
   const handleSubmit = async () => {
@@ -185,7 +214,7 @@ export default function CountryPicks({ authInfo }) {
         <div
           style={{
             position: "sticky",
-            top: "60px", // below fixed navbar
+            top: "60px",
             zIndex: 100,
             background: "#fff",
             padding: "12px",
@@ -253,6 +282,7 @@ export default function CountryPicks({ authInfo }) {
         >
           {/* COUNTRY LIST */}
           <div style={{ border: "1px solid #ddd", borderRadius: "8px" }}>
+            {/* COUNTRY ROWS */}
             {sortedCountries.map((country) => {
               const isSelected = selectedCountries.some(
                 (c) => c.country_name === country.country_name
@@ -309,6 +339,35 @@ export default function CountryPicks({ authInfo }) {
                 </label>
               );
             })}
+
+            {/* WRITE-IN ROW */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "8px 12px",
+                borderTop: "1px solid #eee",
+                background: "#fff7ed",
+                marginTop: "8px",
+                gap: "8px",
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Write-in country (costs $1)"
+                value={writeIn}
+                onChange={(e) => setWriteIn(e.target.value)}
+                style={{ flex: 1, padding: "4px 6px", borderRadius: "6px", border: "1px solid #ccc" }}
+              />
+              <Button
+                size="sm"
+                onClick={handleAddWriteIn}
+                disabled={remainingBudget < WRITE_IN_PRICE}
+              >
+                Add ($1)
+              </Button>
+            </div>
           </div>
 
           {/* STICKY ROSTER */}
