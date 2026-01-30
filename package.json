@@ -1,5 +1,5 @@
 {
-  "name": "fantasyplayoffs",
+  "name": "olympics",
   "version": "1.0.0",
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "server.js",
@@ -20,6 +20,7 @@
     "axios": "^1.3.2",
     "bootstrap": "^5.2.3",
     "cors": "^2.8.5",
+    "country-flag-icons": "^1.6.12",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "if-env": "^1.0.4",
@@ -43,10 +44,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ezinkow/fantasyplayoffs.git"
+    "url": "git+https://github.com/ezinkow/olympics.git"
   },
   "bugs": {
-    "url": "https://github.com/ezinkow/fantasyplayoffs/issues"
+    "url": "https://github.com/ezinkow/olympics/issues"
   },
-  "homepage": "https://github.com/ezinkow/fantasyplayoffs#readme"
+  "homepage": "https://github.com/ezinkow/olympics#readme"
 }

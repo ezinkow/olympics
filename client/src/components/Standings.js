@@ -1,73 +1,63 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-/** SCORE COLUMNS */
-const ROUND_SCORE_COLUMN = {
-  1: "wild_card_score",
-  2: "divisional_score",
-  3: "conf_championship_score",
-  4: "super_bowl_score",
-};
-
-const ROUND_LABELS = {
-  1: "Wild Card",
-  2: "Divisional",
-  3: "Conference",
-  4: "Super Bowl",
-};
-
-/** HELPERS */
-function buildStandings(rows) {
-  const map = {};
-
-  rows.forEach((row) => {
-    if (!map[row.name]) {
-      map[row.name] = {
-        name: row.name,
-        rounds: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-        },
-        total: 0,
-      };
-    }
-
-    const score =
-      Number(row[ROUND_SCORE_COLUMN[row.round]]) || 0;
-
-    map[row.name].rounds[row.round] += score;
-    map[row.name].total += score;
-  });
-
-  return Object.values(map).sort(
-    (a, b) => b.total - a.total
-  );
-}
-
-/** COMPONENT */
+/* COMPONENT */
 export default function Standings() {
-  const [rows, setRows] = useState([]);
+  const [standings, setStandings] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get("/api/startingrosters").then((res) => {
-      setRows(res.data);
-    });
+    async function loadStandings() {
+      try {
+        const res = await axios.get("/api/standings");
+        setStandings(res.data || []);
+      } catch (err) {
+        console.error("Failed to load standings:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadStandings();
   }, []);
 
-  const standings = useMemo(
-    () => buildStandings(rows),
-    [rows]
-  );
+  if (loading) return <div style={{ padding: 16 }}>Loading...</div>;
+
+  const renderCountries = (countryList) => {
+    if (!countryList) return null;
+    const countries = countryList.split("<br>");
+    const mid = Math.ceil(countries.length / 2);
+    const col1 = countries.slice(0, mid);
+    const col2 = countries.slice(mid);
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          gap: "16px",
+          maxHeight: "150px",
+          overflowY: "auto",
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          {col1.map((c, idx) => (
+            <div key={idx}>{c}</div>
+          ))}
+        </div>
+        <div style={{ flex: 1 }}>
+          {col2.map((c, idx) => (
+            <div key={idx}>{c}</div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={{ padding: "16px" }}>
-      <h2 style={{ marginBottom: "16px" }}>
-        📊 Playoff Standings
-      </h2>
+      <h2 style={{ marginBottom: "16px" }}>🏅 Olympic Pool Standings</h2>
 
-      <div style={{ overflowX: "auto" }}>
+      <div style={{ overflowX: "auto", maxHeight: "600px", overflowY: "auto" }}>
         <table
           style={{
             width: "100%",
@@ -75,28 +65,29 @@ export default function Standings() {
             minWidth: "600px",
           }}
         >
-          <thead>
-            <tr style={{ background: "#f3f4f6" }}>
+          <thead style={{ position: "sticky", top: 0, background: "#f3f4f6", zIndex: 2 }}>
+            <tr>
               <th style={thStyle}>Rank</th>
               <th style={thStyle}>Name</th>
-              {Object.entries(ROUND_LABELS).map(
-                ([round, label]) => (
-                  <th key={round} style={thStyle}>
-                    {label}
-                  </th>
-                )
-              )}
-              <th style={thStyle}>Total</th>
+              <th style={thStyle}>Countries</th>
+              <th style={thStyle}>Total Score</th>
             </tr>
           </thead>
 
           <tbody>
+            {standings.length === 0 && (
+              <tr>
+                <td colSpan={4} style={tdStyle}>
+                  No standings yet.
+                </td>
+              </tr>
+            )}
+
             {standings.map((row, idx) => (
               <tr
                 key={row.name}
                 style={{
-                  background:
-                    idx % 2 === 0 ? "#fff" : "#f9fafb",
+                  background: idx % 2 === 0 ? "#fff" : "#f9fafb",
                 }}
               >
                 <td style={tdStyle}>
@@ -106,34 +97,12 @@ export default function Standings() {
                   {idx + 1}
                 </td>
 
-                <td
-                  style={{
-                    ...tdStyle,
-                    fontWeight: 600,
-                  }}
-                >
-                  {row.name}
-                </td>
+                <td style={{ ...tdStyle, fontWeight: 600 }}>{row.name}</td>
 
-                {Object.keys(ROUND_LABELS).map(
-                  (round) => (
-                    <td
-                      key={round}
-                      style={tdStyle}
-                    >
-                      {row.rounds[round].toFixed(2)}
-                    </td>
-                  )
-                )}
+                <td style={tdStyle}>{renderCountries(row.country_list)}</td>
 
-                <td
-                  style={{
-                    ...tdStyle,
-                    fontWeight: 700,
-                    color: "#2563eb",
-                  }}
-                >
-                  {row.total.toFixed(2)}
+                <td style={{ ...tdStyle, fontWeight: 700, color: "#2563eb" }}>
+                  {row.total}
                 </td>
               </tr>
             ))}
@@ -144,7 +113,7 @@ export default function Standings() {
   );
 }
 
-/** STYLES */
+/* STYLES */
 const thStyle = {
   padding: "10px",
   textAlign: "left",

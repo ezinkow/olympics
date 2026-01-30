@@ -9,10 +9,10 @@ export default function Home() {
 
       <div className="home-hero">
         <div className="hero-content">
-          <h1>🏈 NFL Playoff Pool</h1>
+          <h1>🏅 Fantasy Olympics Salary Cap</h1>
           <p>
-            Build your roster. Start your guys.  
-            Most points wins.
+            Draft countries. Rack up the medals.  
+            Chase Olympic glory.
           </p>
 
           <div className="hero-actions">
@@ -21,12 +21,12 @@ export default function Home() {
             </Link>
 
             <a
-              href="https://www.nfl.com/scores"
+              href="https://olympics.com/en/olympic-games"
               target="_blank"
               rel="noreferrer"
               className="secondary-btn"
             >
-              Live NFL Scores
+              Official Olympic Site
             </a>
           </div>
         </div>
@@ -38,17 +38,17 @@ export default function Home() {
         <div className="steps">
           <Link to="/rosterpicks" className="step step-link">
             <span>1</span>
-            Create your playoff roster
-          </Link>
-
-          <Link to="/myroster" className="step step-link">
-            <span>2</span>
-            Set your weekly lineup
+            Select your countries within the $150 salary cap
           </Link>
 
           <Link to="/scoreboard" className="step step-link">
+            <span>2</span>
+            Track your medal winners
+          </Link>
+
+          <Link to="/standings" className="step step-link">
             <span>3</span>
-            Climb the leaderboard 🏆
+            Climb the leaderboard 🥇
           </Link>
         </div>
       </div>

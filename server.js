@@ -21,12 +21,11 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Routes
-require("./routes/rosters-api-routes.js")(app);
-require("./routes/playerpools-api-routes.js")(app);
+require("./routes/countrypools-api-routes.js")(app);
 require("./routes/names-api-routes.js")(app);
+require("./routes/olympicrosters-api-routes.js")(app);
 require("./routes/standings-api-routes.js")(app);
-require("./routes/startingrosters-api-routes.js")(app);
-require("./routes/gamestates-api-routes.js")(app);
+// require("./routes/scoreboard-api-routes.js")(app);
 
 // React Router fallback
 if (process.env.NODE_ENV === 'production') {

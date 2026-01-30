@@ -1,6 +1,6 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
-import PlayerStats from '../components/PlayerPoolsTable'
+import CountryPicks from '../components/CountryPicks'
 
 export default function PicksDisplay() {
 
@@ -8,7 +8,7 @@ export default function PicksDisplay() {
     return (
         <div>
             <Navbar />
-            <PlayerStats />
+            <CountryPicks />
         </div>
     )
 }

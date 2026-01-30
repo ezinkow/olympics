@@ -9,10 +9,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Home from './pages/Home';
 import Scoreboard from './pages/Scoreboard';
 import Standings from './pages/Standings';
-import RosterPicks from './pages/RosterPicks';
-import MyRoster from './pages/MyRoster';
+import CountryPicks from './pages/CountryPicks';
 import SignUp from './pages/SignUp';
-import PlayerPoolsTable from './pages/PlayerStats';
+import MedalTable from './pages/MedalTable';
 
 export default function App() {
 
@@ -20,11 +19,10 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/rosterpicks" element={<RosterPicks />} />
+        <Route path="/countrypicks" element={<CountryPicks />} />
         <Route path="/scoreboard" element={<Scoreboard />} />
-        <Route path="/myroster" element={<MyRoster />} />
         <Route path="/standings" element={<Standings />} />
-        <Route path="/playerstats" element={<PlayerPoolsTable />} />
+        <Route path="/medaltable" element={<MedalTable />} />
         <Route path="/" element={<Home />} />
       </Routes>
     </Router>

@@ -1,13 +1,13 @@
-const { Rosters } = require("../models");
+const { OlympicRosters } = require("../models");
 
 module.exports = function (app) {
 
     // ----------------------------------
     // GET all rosters (admin/debug)
     // ----------------------------------
-    app.get("/api/rosters", async (req, res) => {
+    app.get("/api/olympic-rosters", async (req, res) => {
         try {
-            const rows = await Rosters.findAll();
+            const rows = await OlympicRosters.findAll();
             res.json(rows);
         } catch (err) {
             res.status(500).json(err);
@@ -17,9 +17,9 @@ module.exports = function (app) {
     // ----------------------------------
     // GET roster by name (used for overwrite warning)
     // ----------------------------------
-    app.get("/api/rosters/by-name/:name", async (req, res) => {
+    app.get("/api/olympic-rosters/by-name/:name", async (req, res) => {
         try {
-            const rows = await Rosters.findAll({
+            const rows = await OlympicRosters.findAll({
                 where: { name: req.params.name },
                 order: [["id", "ASC"]],
             });
@@ -29,12 +29,12 @@ module.exports = function (app) {
         }
     });
 
-    app.get("/api/rosters/getmyroster", async (req, res) => {
+    app.get("/api/olympic-rosters/getmyroster", async (req, res) => {
         try {
             const { name } = req.query;
             if (!name) return res.status(400).json({ error: "Missing name parameter" });
 
-            const rows = await Rosters.findAll({
+            const rows = await OlympicRosters.findAll({
                 where: { name },
                 order: [["id", "ASC"]],
             });
@@ -51,7 +51,7 @@ module.exports = function (app) {
     // ----------------------------------
     // POST roster (OVERWRITE SAFE)
     // ----------------------------------
-    app.post("/api/rosters", async (req, res) => {
+    app.post("/api/olympic-rosters", async (req, res) => {
         try {
             const data = Array.isArray(req.body) ? req.body : [req.body];
             const name = data[0]?.name;
@@ -61,16 +61,14 @@ module.exports = function (app) {
             }
 
             // 🔥 delete existing roster first
-            await Rosters.destroy({ where: { name } });
+            await OlympicRosters.destroy({ where: { name } });
 
             // insert new roster
-            const created = await Rosters.bulkCreate(
+            const created = await OlympicRosters.bulkCreate(
                 data.map(row => ({
                     name: row.name,
-                    player_name: row.player_name,
-                    position: row.position,
-                    team: row.team,
-                    tier: row.tier,
+                    country: row.country_name,
+                    price: row.price,
                 }))
             );
 
