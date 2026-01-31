@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const location = useLocation();
-  const isActive = (path) => location.pathname === path;
-  const NAVBAR_HEIGHT = 60; // adjust to your navbar height
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const NAVBAR_HEIGHT = 60;
+
+  // Close menu on navigation
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  // Lock scroll when menu open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+  }, [menuOpen]);
 
   return (
     <>
@@ -22,35 +33,54 @@ export default function Navbar() {
           alignItems: "center",
         }}
       >
-        <div className="navbar-center" style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <nav className="navbar-links" style={{ display: "flex", gap: "16px" }}>
-            <Link to="/countrypicks" className={isActive("/rosterpicks") ? "active" : ""}>
-              Create Roster
-            </Link>
-            {/* <Link to="/scoreboard" className={isActive("/scoreboard") ? "active" : ""}>
-              Scoreboard
-            </Link> */}
-            <Link to="/standings" className={isActive("/standings") ? "active" : ""}>
-              Standings
-            </Link>
-            <Link to="/myroster" className={isActive("/myroster") ? "active" : ""}>
-              My Roster
-            </Link>
-            <Link to="/medaltable" className={isActive("/medaltable") ? "active" : ""}>
-              Medal Table
-            </Link>
-            <Link to="/signup" className={isActive("/signup") ? "active" : ""}>
-              Sign Up
-            </Link>
+        <div
+          className="navbar-center"
+          style={{
+            width: "100%",
+            maxWidth: "1200px",
+            margin: "0 auto",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            position: "relative",
+          }}
+        >
+          {/* Hamburger */}
+          <button
+            className={`menu-toggle ${menuOpen ? "open" : ""}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+
+          {/* Links */}
+          <nav className={`navbar-links ${menuOpen ? "open" : ""}`}>
+            <Link to="/countrypicks">Create Roster</Link>
+            <Link to="/standings">Standings</Link>
+            <Link to="/myroster">My Roster</Link>
+            <Link to="/medaltable">Medal Table</Link>
+            <Link to="/signup">Sign Up</Link>
           </nav>
 
-          <Link to="/" className="navbar-brand" style={{ fontWeight: "bold" }}>
+          {/* Brand */}
+          <Link to="/" className="navbar-brand">
             🏅Olympics Pool
           </Link>
         </div>
       </header>
 
-      {/* Spacer so page content isn’t hidden under fixed navbar */}
+      {/* Overlay */}
+      {menuOpen && (
+        <div
+          className="menu-overlay"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* Spacer */}
       <div style={{ height: `${NAVBAR_HEIGHT}px` }} />
     </>
   );
