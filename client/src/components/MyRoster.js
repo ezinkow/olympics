@@ -72,7 +72,7 @@ export default function MyRoster() {
   };
 
   return (
-    <div style={{ padding: "16px", maxWidth: "800px", margin: "0 auto" }}>
+    <table className="table-wrapper" style={{ padding: "16px", maxWidth: "800px", margin: "0 auto" }}>
       <Toaster />
 
       <h2 style={{ marginBottom: "16px" }}>📝 My Olympic Roster</h2>
@@ -115,6 +115,6 @@ export default function MyRoster() {
             ))}
         </div>
       )}
-    </div>
+    </table>
   );
 }

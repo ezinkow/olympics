@@ -37,18 +37,18 @@ export default function Home() {
 
         <div className="steps">
           <Link to="/rosterpicks" className="step step-link">
-            <span>1</span>
-            Select your countries within the $150 salary cap
+            <span>1: </span>
+            Build your roster $150 salary cap 🎿
           </Link>
 
           <Link to="/scoreboard" className="step step-link">
-            <span>2</span>
-            Track your medal winners
+            <span>2: </span>
+            Climb the leaderboard 🏂
           </Link>
 
           <Link to="/standings" className="step step-link">
-            <span>3</span>
-            Climb the leaderboard 🥇
+            <span>3: </span>
+            Chase Olympic Glory 🥇
           </Link>
         </div>
       </div>

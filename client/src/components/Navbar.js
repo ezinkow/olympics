@@ -67,7 +67,7 @@ export default function Navbar() {
 
           {/* Brand */}
           <Link to="/" className="navbar-brand">
-            🏅Olympics Pool
+            🏅Olympics Salary Cap
           </Link>
         </div>
       </header>
@@ -82,6 +82,14 @@ export default function Navbar() {
 
       {/* Spacer */}
       <div style={{ height: `${NAVBAR_HEIGHT}px` }} />
+      <nav className="mobile-bottom-nav">
+        <Link to="/">🏠</Link>
+        <Link to="/countrypicks">📝</Link>
+        <Link to="/standings">🏅</Link>
+        <Link to="/medaltable">📊</Link>
+        <Link to="/myroster">👤</Link>
+      </nav>
+
     </>
   );
 }
