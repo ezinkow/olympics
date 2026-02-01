@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import NewsFeed from "../components/NewsFeed";
 
 export default function Home() {
   return (
@@ -52,6 +53,7 @@ export default function Home() {
           </Link>
         </div>
       </div>
+      <NewsFeed/>
     </>
   );
 }

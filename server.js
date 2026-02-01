@@ -1,4 +1,5 @@
 // Dependencies
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -25,6 +26,7 @@ require("./routes/countrypools-api-routes")(app);
 require("./routes/names-api-routes")(app);
 require("./routes/olympicrosters-api-routes")(app);
 require("./routes/standings-api-routes")(app);
+require("./routes/news-api-routes")(app);
 
 // React Router fallback
 if (process.env.NODE_ENV === "production") {
