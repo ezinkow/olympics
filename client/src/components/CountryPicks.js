@@ -214,13 +214,23 @@ export default function CountryPicks({ authInfo }) {
           }}
           style={{ display: "flex", gap: "8px", marginBottom: "16px" }}
         >
-          <DropdownButton title={name} onSelect={handleNameSelect}>
-            {names.map((n) => (
-              <Dropdown.Item key={n.name} eventKey={n.name}>
-                {n.name}
-              </Dropdown.Item>
-            ))}
-          </DropdownButton>
+          <Dropdown onSelect={handleNameSelect}>
+            <Dropdown.Toggle className="roster-dropdown-toggle">
+              {name}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu
+              popperConfig={{
+                strategy: "fixed",
+              }}
+            >
+              {names.map((n) => (
+                <Dropdown.Item key={n.name} eventKey={n.name}>
+                  {n.name}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
 
           <input
             type="password"

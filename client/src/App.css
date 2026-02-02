@@ -10,7 +10,8 @@
 html,
 body {
   max-width: 100%;
-  overflow-x: auto; /* <-- change from hidden to auto */
+  overflow-x: auto;
+  /* <-- change from hidden to auto */
   overflow-y: auto;
 }
 
@@ -296,7 +297,7 @@ body {
     margin-bottom: 12px;
     border-radius: 12px;
     padding: 12px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
   }
 
   .table-wrapper td {
@@ -322,6 +323,26 @@ body {
     background: white;
     padding: 10px;
   }
+
+  .roster-auth-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .roster-name-dropdown,
+  .roster-password,
+  .roster-verify-btn {
+    width: 100%;
+  }
+
+  /* Make dropdown menu full-width on mobile */
+  .roster-name-dropdown .dropdown-menu {
+    width: 100%;
+    max-height: 50vh;
+    width: calc(100vw - 32px);
+    left: 16px !important;
+    right: 16px !important;
+  }
 }
 
 .news-feed {
@@ -330,7 +351,7 @@ body {
   padding: 14px;
   margin: 16px auto;
   max-width: 720px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
 .news-title {
@@ -370,3 +391,66 @@ body {
   color: #777;
 }
 
+/* ===============================
+   ROSTER AUTH ROW (FIX DROPDOWN)
+================================ */
+
+.roster-auth-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+
+  /* CRITICAL */
+  overflow: visible;
+}
+
+.roster-name-dropdown {
+  flex-shrink: 0;
+}
+
+/* Force dropdown menu to float above everything */
+.roster-name-dropdown .dropdown-menu {
+  max-height: 260px;
+  overflow-y: auto;
+  font-size: 16px;
+  z-index: 2000;
+}
+
+/* Make dropdown items tall + tappable */
+.roster-name-dropdown .dropdown-item {
+  padding: 12px 16px;
+  font-size: 16px;
+}
+
+/* Inputs */
+.roster-password {
+  flex: 1;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.roster-verify-btn {
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+/* Ensure dropdown always floats above navbar */
+.dropdown-menu {
+  z-index: 3000 !important;
+}
+
+.roster-dropdown-toggle {
+  background: #2563eb;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.dropdown-menu {
+  max-height: 60vh;
+  overflow-y: auto;
+  z-index: 4000 !important;
+}
