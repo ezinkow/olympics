@@ -58,9 +58,9 @@ export default function Navbar() {
 
           {/* Links */}
           <nav className={`navbar-links ${menuOpen ? "open" : ""}`}>
-            <Link to="/countrypicks">Create Roster</Link>
+            <Link to="/countrypicks">Create Team</Link>
             <Link to="/standings">Standings</Link>
-            <Link to="/myroster">My Roster</Link>
+            <Link to="/myteam">My Team</Link>
             <Link to="/medaltable">Medal Table</Link>
             <Link to="/signup">Sign Up</Link>
           </nav>
@@ -87,7 +87,7 @@ export default function Navbar() {
         <Link to="/countrypicks">📝</Link>
         <Link to="/standings">🏅</Link>
         <Link to="/medaltable">📊</Link>
-        <Link to="/myroster">👤</Link>
+        <Link to="/myteam">👤</Link>
       </nav>
 
     </>

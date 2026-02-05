@@ -1,13 +1,13 @@
-const { OlympicRosters } = require("../models");
+const { OlympicTeams } = require("../models");
 
 module.exports = function (app) {
 
     // ----------------------------------
-    // GET all rosters (admin/debug)
+    // GET all teams (admin/debug)
     // ----------------------------------
-    app.get("/api/olympic-rosters", async (req, res) => {
+    app.get("/api/olympic-teams", async (req, res) => {
         try {
-            const rows = await OlympicRosters.findAll();
+            const rows = await OlympicTeams.findAll();
             res.json(rows);
         } catch (err) {
             res.status(500).json(err);
@@ -17,9 +17,9 @@ module.exports = function (app) {
     // ----------------------------------
     // GET roster by name (used for overwrite warning)
     // ----------------------------------
-    app.get("/api/olympic-rosters/by-name/:name", async (req, res) => {
+    app.get("/api/olympic-teams/by-name/:name", async (req, res) => {
         try {
-            const rows = await OlympicRosters.findAll({
+            const rows = await OlympicTeams.findAll({
                 where: { name: req.params.name },
                 order: [["id", "ASC"]],
             });
@@ -29,12 +29,12 @@ module.exports = function (app) {
         }
     });
 
-    app.get("/api/olympic-rosters/getmyroster", async (req, res) => {
+    app.get("/api/olympic-teams/getmyroster", async (req, res) => {
         try {
             const { name } = req.query;
             if (!name) return res.status(400).json({ error: "Missing name parameter" });
 
-            const rows = await OlympicRosters.findAll({
+            const rows = await OlympicTeams.findAll({
                 where: { name },
                 order: [["id", "ASC"]],
             });
@@ -51,7 +51,7 @@ module.exports = function (app) {
     // ----------------------------------
     // POST roster (OVERWRITE SAFE)
     // ----------------------------------
-    app.post("/api/olympic-rosters", async (req, res) => {
+    app.post("/api/olympic-teams", async (req, res) => {
         try {
             const data = Array.isArray(req.body) ? req.body : [req.body];
             const name = data[0]?.name;
@@ -61,10 +61,10 @@ module.exports = function (app) {
             }
 
             // 🔥 delete existing roster first
-            await OlympicRosters.destroy({ where: { name } });
+            await OlympicTeams.destroy({ where: { name } });
 
             // insert new roster
-            const created = await OlympicRosters.bulkCreate(
+            const created = await OlympicTeams.bulkCreate(
                 data.map(row => ({
                     name: row.name,
                     country_name: row.country_name,

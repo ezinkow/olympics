@@ -37,12 +37,12 @@ export default function Home() {
         <h2>How It Works</h2>
 
         <div className="steps">
-          <Link to="/rosterpicks" className="step step-link">
+          <Link to="/teampicks" className="step step-link">
             <span>1: </span>
-            Build your roster $150 salary cap 🎿
+            Build your team under the $150 salary cap 🎿
           </Link>
 
-          <Link to="/myroster" className="step step-link">
+          <Link to="/myteam" className="step step-link">
             <span>2: </span>
             Climb the leaderboard 🏂
           </Link>

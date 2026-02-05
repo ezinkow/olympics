@@ -1,6 +1,6 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
-import MyRoster from '../components/MyRoster'
+import MyTeam from '../components/MyTeam'
 
 export default function PicksContainer() {
 
@@ -9,7 +9,7 @@ export default function PicksContainer() {
         <div>
             <Navbar />
             <div className='=container'>
-                <MyRoster />
+                <MyTeam />
             </div>
         </div>
     )

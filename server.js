@@ -24,8 +24,9 @@ if (process.env.NODE_ENV === "production") {
 // Routes (pass app to each module)
 require("./routes/countrypools-api-routes")(app);
 require("./routes/names-api-routes")(app);
-require("./routes/olympicrosters-api-routes")(app);
+require("./routes/olympicteams-api-routes")(app);
 require("./routes/standings-api-routes")(app);
+require("./routes/scoreboard-api-routes")(app);
 require("./routes/news-api-routes")(app);
 
 // React Router fallback

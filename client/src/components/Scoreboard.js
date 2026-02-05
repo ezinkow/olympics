@@ -45,10 +45,40 @@ export default function Scoreboard() {
 
     const renderCol = (col) =>
       col.map((c, i) => (
-        <div key={i}>
-          {c.country_name} — <strong>{c.points}</strong> pts — ${c.price}
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "4px 0",
+            fontSize: "13px"
+          }}
+        >
+          <span>{c.country_name}</span>
+          <span>
+            <strong>{c.points}</strong>
+          </span>
         </div>
+
       ));
+
+    const SCOREBOARD_UNLOCK = new Date("2026-02-07T09:00:00Z");
+    // 3:00 AM CT = 9:00 UTC
+
+    const now = new Date();
+
+    if (now < SCOREBOARD_UNLOCK) {
+      return (
+        <div style={{ padding: "24px", textAlign: "center" }}>
+          <h2>🏅 Scoreboard Locked</h2>
+          <p>
+            The Olympic Pool scoreboard will go live at
+            <br />
+            <strong>3:00 AM CT · Saturday, February 7</strong>
+          </p>
+        </div>
+      );
+    }
 
     return (
       <div

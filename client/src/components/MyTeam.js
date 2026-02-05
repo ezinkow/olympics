@@ -5,12 +5,12 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import toast, { Toaster } from "react-hot-toast";
 
-export default function MyRoster() {
+export default function MyTeam() {
     const [names, setNames] = useState([]);
     const [name, setName] = useState("SELECT YOUR NAME");
     const [password, setPassword] = useState("");
     const [authenticated, setAuthenticated] = useState(false);
-    const [roster, setRoster] = useState([]);
+    const [team, setTeam] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // Fetch all names for dropdown
@@ -31,7 +31,7 @@ export default function MyRoster() {
         setName(selectedName);
         setAuthenticated(false);
         setPassword("");
-        setRoster([]);
+        setTeam([]);
     };
 
     // Verify password
@@ -46,7 +46,7 @@ export default function MyRoster() {
             if (res.data.success) {
                 setAuthenticated(true);
                 toast.success("Password verified!");
-                fetchRoster();
+                fetchTeam();
             } else {
                 toast.error("Incorrect password");
             }
@@ -55,17 +55,17 @@ export default function MyRoster() {
         }
     };
 
-    // Fetch user's roster
-    const fetchRoster = async () => {
+    // Fetch user's team
+    const fetchTeam = async () => {
         setLoading(true);
         try {
-            const res = await axios.get("/api/olympic-rosters/getmyroster", {
+            const res = await axios.get("/api/olympic-teams/getmyteam", {
                 params: { name },
             });
-            setRoster(res.data || []);
+            setTeam(res.data || []);
         } catch (err) {
             console.error(err);
-            toast.error("Failed to load roster");
+            toast.error("Failed to load team");
         } finally {
             setLoading(false);
         }
@@ -75,12 +75,12 @@ export default function MyRoster() {
         <div style={{ padding: "16px", maxWidth: "800px", margin: "0 auto" }}>
             <Toaster />
 
-            <h2 style={{ marginBottom: "16px" }}>📝 My Olympic Roster</h2>
+            <h2 style={{ marginBottom: "16px" }}>📝 My Olympic Team</h2>
 
             {!authenticated && (
-                <div className="roster-auth-row">
+                <div className="team-auth-row">
                     <Dropdown onSelect={handleNameSelect}>
-                        <Dropdown.Toggle className="roster-dropdown-toggle">
+                        <Dropdown.Toggle className="team-dropdown-toggle">
                             {name}
                         </Dropdown.Toggle>
 
@@ -102,10 +102,10 @@ export default function MyRoster() {
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="roster-password"
+                        className="team-password"
                     />
 
-                    <Button className="roster-verify-btn" onClick={handleVerifyPassword}>
+                    <Button className="team-verify-btn" onClick={handleVerifyPassword}>
                         Verify
                     </Button>
                 </div>
@@ -113,14 +113,14 @@ export default function MyRoster() {
 
             {authenticated && (
                 <div>
-                    <h3>{name}'s Roster</h3>
+                    <h3>{name}'s Team</h3>
                     {loading && <p>Loading...</p>}
 
-                    {!loading && roster.length === 0 && <p>No countries selected yet.</p>}
+                    {!loading && team.length === 0 && <p>No countries selected yet.</p>}
 
                     {!loading &&
-                        roster.length > 0 &&
-                        roster.map((c, idx) => (
+                        team.length > 0 &&
+                        team.map((c, idx) => (
                             <div key={idx} style={{ padding: "4px 0" }}>
                                 {c.country_name} - ${c.price}
                             </div>

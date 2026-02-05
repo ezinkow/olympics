@@ -12,7 +12,7 @@ import Standings from './pages/Standings';
 import CountryPicks from './pages/CountryPicks';
 import SignUp from './pages/SignUp';
 import MedalTable from './pages/MedalTable';
-import MyRoster from './pages/MyRoster';
+import MyTeam from './pages/MyTeam';
 
 export default function App() {
 
@@ -24,7 +24,7 @@ export default function App() {
         <Route path="/scoreboard" element={<Scoreboard />} />
         <Route path="/standings" element={<Standings />} />
         <Route path="/medaltable" element={<MedalTable />} />
-        <Route path="/myroster" element={<MyRoster />} />
+        <Route path="/myteam" element={<MyTeam />} />
         <Route path="/" element={<Home />} />
       </Routes>
     </Router>

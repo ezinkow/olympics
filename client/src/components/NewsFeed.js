@@ -1,25 +1,49 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const CACHE_KEY = "olympic_news_cache";
+const CACHE_TTL = 1000 * 60 * 60; // 1 hour
+
 export default function NewsFeed() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadNews = async () => {
-      try {
-        const res = await axios.get("/api/news");
-        setNews(res.data);
-        console.log(res.data)
-      } catch (err) {
-        console.error("Failed to load news");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadNews = async () => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
 
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+
+        if (Date.now() - timestamp < CACHE_TTL) {
+          setNews(data);
+          setLoading(false);
+          return;
+        }
+      }
+
+      const res = await axios.get("/api/news");
+
+      setNews(res.data);
+
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({
+          data: res.data,
+          timestamp: Date.now(),
+        })
+      );
+    } catch (err) {
+      console.error("Failed to load news", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadNews();
-    const interval = setInterval(loadNews, 60000); // refresh every minute
+
+    const interval = setInterval(loadNews, CACHE_TTL); // refresh hourly
     return () => clearInterval(interval);
   }, []);
 

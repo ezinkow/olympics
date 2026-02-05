@@ -1,12 +1,17 @@
 module.exports = function (sequelize, DataTypes) {
-    const CountryStats = sequelize.define("CountryStats", {
+    const MedalTables = sequelize.define(
+        "MedalTables",
+        {
+            country_name: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            gold: DataTypes.INTEGER,
+            silver: DataTypes.INTEGER,
+            bronze: DataTypes.INTEGER,
+            score: DataTypes.INTEGER,
+        }
+    );
 
-        name: { type: DataTypes.STRING, allowNull: false },
-        team: DataTypes.STRING,
-        position: DataTypes.STRING,
-        fantasy_points: DataTypes.FLOAT,
-        round: DataTypes.INTEGER,
-    });
-
-    return CountryStats;
+    return MedalTables;
 };

@@ -1,5 +1,5 @@
 module.exports = function (sequelize, DataTypes) {
-    const OlympicRosters = sequelize.define("OlympicRosters", {
+    const OlympicTeams = sequelize.define("OlympicTeams", {
         name: {
             type: DataTypes.TEXT,
             allowNull: false
@@ -14,5 +14,5 @@ module.exports = function (sequelize, DataTypes) {
         }
     });
 
-    return OlympicRosters;
+    return OlympicTeams;
 };

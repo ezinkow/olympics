@@ -10,7 +10,7 @@ module.exports = function (app) {
           r.name,
           SUM(m.score) AS total,
           GROUP_CONCAT(CONCAT(r.country_name, ' — ', m.score) ORDER BY m.score DESC SEPARATOR '<br>') AS country_list
-        FROM olympicrosters r
+        FROM olympicteams r
         JOIN medaltable m
           ON m.country_name = r.country_name
         GROUP BY r.name
