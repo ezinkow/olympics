@@ -5,7 +5,7 @@ module.exports = function (app) {
     // ----------------------------------
     // GET all teams (admin/debug)
     // ----------------------------------
-    app.get("/api/olympic-teams", async (req, res) => {
+    app.get("/api/olympicteams", async (req, res) => {
         try {
             const rows = await OlympicTeams.findAll();
             res.json(rows);
@@ -15,9 +15,9 @@ module.exports = function (app) {
     });
 
     // ----------------------------------
-    // GET roster by name (used for overwrite warning)
+    // GET team by name (used for overwrite warning)
     // ----------------------------------
-    app.get("/api/olympic-teams/by-name/:name", async (req, res) => {
+    app.get("/api/olympicteams/by-name/:name", async (req, res) => {
         try {
             const rows = await OlympicTeams.findAll({
                 where: { name: req.params.name },
@@ -29,7 +29,7 @@ module.exports = function (app) {
         }
     });
 
-    app.get("/api/olympic-teams/getmyroster", async (req, res) => {
+    app.get("/api/olympicteams/getmyteam", async (req, res) => {
         try {
             const { name } = req.query;
             if (!name) return res.status(400).json({ error: "Missing name parameter" });
@@ -43,15 +43,15 @@ module.exports = function (app) {
             res.json(Array.isArray(rows) ? rows : []);
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: "Failed to fetch user's roster" });
+            res.status(500).json({ error: "Failed to fetch user's team" });
         }
     });
 
 
     // ----------------------------------
-    // POST roster (OVERWRITE SAFE)
+    // POST team (OVERWRITE SAFE)
     // ----------------------------------
-    app.post("/api/olympic-teams", async (req, res) => {
+    app.post("/api/olympicteams", async (req, res) => {
         try {
             const data = Array.isArray(req.body) ? req.body : [req.body];
             const name = data[0]?.name;
@@ -60,10 +60,10 @@ module.exports = function (app) {
                 return res.status(400).json({ error: "Missing name" });
             }
 
-            // 🔥 delete existing roster first
+            // 🔥 delete existing team first
             await OlympicTeams.destroy({ where: { name } });
 
-            // insert new roster
+            // insert new team
             const created = await OlympicTeams.bulkCreate(
                 data.map(row => ({
                     name: row.name,

@@ -59,7 +59,7 @@ export default function MyTeam() {
     const fetchTeam = async () => {
         setLoading(true);
         try {
-            const res = await axios.get("/api/olympic-teams/getmyteam", {
+            const res = await axios.get("/api/olympicteams/getmyteam", {
                 params: { name },
             });
             setTeam(res.data || []);
