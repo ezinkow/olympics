@@ -148,7 +148,7 @@ export default function Scoreboard() {
                 {idx === 2 && "🥉 "}
                 {user.name}
                 <div style={{ fontSize: "13px", color: "#2563eb" }}>
-                  Total: {user.total} pts — ${user.totalPrice || 0}
+                  Total: {user.total} pts
                 </div>
               </div>
 
