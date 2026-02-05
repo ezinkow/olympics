@@ -17,6 +17,11 @@ export default function CountryPicks({ authInfo }) {
   const [names, setNames] = useState([]);
   const [sortBy, setSortBy] = useState("price");
   const [writeIn, setWriteIn] = useState("");
+  const LOCK_TIME = new Date("2026-02-07T09:00:00Z"); // 3am CT = 9am UTC
+
+  const isLocked = useMemo(() => {
+    return new Date() >= LOCK_TIME;
+  }, []);
 
   /* -------------------- DATA FETCH -------------------- */
   useEffect(() => {
