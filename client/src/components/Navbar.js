@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const location = useLocation();
@@ -16,6 +16,15 @@ export default function Navbar() {
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
   }, [menuOpen]);
+
+  const handleNavClick = (path) => {
+    setMenuOpen(false);
+
+    if (location.pathname !== path) {
+      navigate(path);
+    }
+  };
+
 
   return (
     <>
@@ -84,12 +93,48 @@ export default function Navbar() {
       {/* Spacer */}
       <div style={{ height: `${NAVBAR_HEIGHT}px` }} />
       <nav className="mobile-bottom-nav">
-        <Link to="/">🏠</Link>
+        <button
+          onClick={() => handleNavClick("/")}
+          className="mobile-nav-link"
+        >
+          🏠
+        </button>
+        <button
+          onClick={() => handleNavClick("/countrypicks")}
+          className="mobile-nav-link"
+        >
+          📝
+        </button>
+        <button
+          onClick={() => handleNavClick("/standings")}
+          className="mobile-nav-link"
+        >
+          🏅
+        </button>
+        <button
+          onClick={() => handleNavClick("/scoreboard")}
+          className="mobile-nav-link"
+        >
+          🔢
+        </button>
+        <button
+          onClick={() => handleNavClick("/medaltable")}
+          className="mobile-nav-link"
+        >
+          📊
+        </button>
+        <button
+          onClick={() => handleNavClick("/myteam")}
+          className="mobile-nav-link"
+        >
+          👤
+        </button>
+        {/* <Link to="/">🏠</Link>
         <Link to="/countrypicks">📝</Link>
         <Link to="/standings">🏅</Link>
         <Link to="/scoreboard">🔢</Link>
         <Link to="/medaltable">📊</Link>
-        <Link to="/myteam">👤</Link>
+        <Link to="/myteam">👤</Link> */}
       </nav>
 
     </>

@@ -269,6 +269,11 @@ body {
     z-index: 1000;
   }
 
+  .mobile-nav-link {
+    background: #111827;
+    border: none;
+  }
+
   .mobile-bottom-nav a {
     color: #e5e7eb;
     font-size: 20px;
