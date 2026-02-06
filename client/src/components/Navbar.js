@@ -78,7 +78,7 @@ export default function Navbar() {
 
           {/* Brand */}
           <Link to="/" className="navbar-brand">
-            🏅Olympics Salary Cap
+            ⛷ Olympics Salary Cap 🏒
           </Link>
         </div>
       </header>
