@@ -2,7 +2,7 @@ import React from 'react'
 import Navbar from '../components/Navbar'
 import Scoreboard from '../components/Scoreboard'
 
-export default function PicksContainer() {
+export default function ScoreboardPage() {
 
 
     return (

@@ -20,9 +20,9 @@ export default function Navbar() {
   const handleNavClick = (path) => {
     setMenuOpen(false);
 
-    if (location.pathname !== path) {
-      navigate(path);
-    }
+    // if (location.pathname !== path) {
+    //   navigate(path);
+    // }
   };
 
 
@@ -67,6 +67,7 @@ export default function Navbar() {
 
           {/* Links */}
           <nav className={`navbar-links ${menuOpen ? "open" : ""}`}>
+            <Link to="/">Home</Link>
             <Link to="/countrypicks">Create Team</Link>
             <Link to="/standings">Standings</Link>
             <Link to="/scoreboard">Scoreboard</Link>
