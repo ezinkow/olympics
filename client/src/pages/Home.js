@@ -42,7 +42,7 @@ export default function Home() {
             Build your team under the $150 salary cap 🎿
           </Link>
 
-          <Link to="/myteam" className="step step-link">
+          <Link to="/scoreboard" className="step step-link">
             <span>2: </span>
             Climb the leaderboard 🏂
           </Link>
