@@ -65,13 +65,11 @@ body {
 }
 
 .navbar-links a {
-  text-decoration: none;
-  color: #e5e7eb;
-  font-weight: 500;
-  font-size: 0.95rem;
-  padding: 6px 8px;
-  border-radius: 6px;
+  background: none;
+  border: none;
+  box-shadow: none;
 }
+
 
 .navbar-links a:hover {
   background: rgba(255, 255, 255, 0.08);
@@ -79,6 +77,16 @@ body {
 
 .navbar-links a.active {
   color: #93c5fd;
+}
+
+.navbar-links button {
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+  color: #facc15;
 }
 
 /* Hamburger */
@@ -255,6 +263,17 @@ body {
   .navbar-links.open {
     transform: translateX(0);
   }
+
+  .navbar-links button {
+    background: transparent;
+    border: none;
+    color: #facc15;
+  }
+  
+  .navbar-links button:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
 
   /* Bottom nav */
   .mobile-bottom-nav {
@@ -458,4 +477,99 @@ body {
   max-height: 60vh;
   overflow-y: auto;
   z-index: 4000 !important;
+}
+
+.scoreboard {
+  padding: 16px;
+}
+
+.scoreboard-title {
+  margin-bottom: 12px;
+}
+
+.scoreboard-top-scroll {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  overflow-x: auto;
+  height: 14px;
+  margin-bottom: 10px;
+}
+
+.scoreboard-scroll {
+  overflow-x: auto;
+}
+
+.scoreboard-cards {
+  display: flex;
+  gap: 16px;
+}
+
+.scoreboard-card {
+  min-width: 260px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.scoreboard-card-header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.scoreboard-total {
+  font-size: 13px;
+  color: #2563eb;
+}
+
+.scoreboard-countries {
+  padding: 10px;
+}
+
+.countries-grid {
+  display: flex;
+  gap: 16px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.country-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+/* 🔒 Locked screen */
+.scoreboard-locked {
+  padding: 48px 16px;
+  text-align: center;
+}
+
+/* .navbar-full {
+  background: none;
+} */
+
+/* 📱 MOBILE */
+@media (max-width: 640px) {
+  .scoreboard-top-scroll {
+    display: none;
+  }
+
+  .scoreboard-scroll {
+    overflow-x: hidden;
+  }
+
+  .scoreboard-cards {
+    flex-direction: column;
+  }
+
+  .scoreboard-card {
+    min-width: 100%;
+  }
 }

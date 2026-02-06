@@ -188,7 +188,7 @@ export default function CountryPicks({ authInfo }) {
     }));
 
     try {
-      await axios.post("/api/olympic-rosters", payload);
+      await axios.post("/api/olympicteams", payload);
       toast.success("Countries submitted!");
       setSelectedCountries([]);
       setAuthenticated(false);

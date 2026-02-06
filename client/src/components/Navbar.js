@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 export default function Navbar() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const NAVBAR_HEIGHT = 60;
 
@@ -20,9 +21,9 @@ export default function Navbar() {
   const handleNavClick = (path) => {
     setMenuOpen(false);
 
-    // if (location.pathname !== path) {
-    //   navigate(path);
-    // }
+    if (location.pathname !== path) {
+      navigate(path);
+    }
   };
 
 
@@ -67,13 +68,13 @@ export default function Navbar() {
 
           {/* Links */}
           <nav className={`navbar-links ${menuOpen ? "open" : ""}`}>
-            <Link to="/">Home</Link>
-            <Link to="/countrypicks">Create Team</Link>
-            <Link to="/standings">Standings</Link>
-            <Link to="/scoreboard">Scoreboard</Link>
-            <Link to="/myteam">My Team</Link>
-            <Link to="/medaltable">Medal Table</Link>
-            <Link to="/signup">Sign Up</Link>
+            <button onClick={() => handleNavClick("/")}>Home</button>
+            <button onClick={() => handleNavClick("/countrypicks")}>Create Team</button>
+            <button onClick={() => handleNavClick("/standings")}>Standings</button>
+            <button onClick={() => handleNavClick("/scoreboard")}>Scoreboard</button>
+            <button onClick={() => handleNavClick("/myteam")}>My Team</button>
+            <button onClick={() => handleNavClick("/medaltable")}>Medal Table</button>
+            <button onClick={() => handleNavClick("/signup")}>Sign Up</button>
           </nav>
 
           {/* Brand */}

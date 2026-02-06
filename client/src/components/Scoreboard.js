@@ -1,11 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
+const SCOREBOARD_UNLOCK = new Date("2026-02-07T09:00:00Z"); // 3:00 AM CT
+
 export default function Scoreboard() {
   const [users, setUsers] = useState([]);
   const scrollRef = useRef(null);
   const topScrollRef = useRef(null);
 
+  const now = new Date();
+  const locked = now < SCOREBOARD_UNLOCK;
+
+  /* -------------------- DATA -------------------- */
   useEffect(() => {
     async function load() {
       try {
@@ -18,7 +24,7 @@ export default function Scoreboard() {
     load();
   }, []);
 
-  /** Sync horizontal scroll */
+  /* -------------------- SCROLL SYNC (DESKTOP) -------------------- */
   useEffect(() => {
     if (!scrollRef.current || !topScrollRef.current) return;
 
@@ -37,123 +43,72 @@ export default function Scoreboard() {
     };
   }, []);
 
-  const renderCountries = (countries) => {
-    if (!countries) return null;
+  /* -------------------- RENDER HELPERS -------------------- */
+  const renderCountries = (countries = []) => {
     const mid = Math.ceil(countries.length / 2);
     const col1 = countries.slice(0, mid);
     const col2 = countries.slice(mid);
 
     const renderCol = (col) =>
       col.map((c, i) => (
-        <div
-          key={i}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "4px 0",
-            fontSize: "13px"
-          }}
-        >
+        <div key={i} className="country-row">
           <span>{c.country_name}</span>
-          <span>
-            <strong>{c.points}</strong>
-          </span>
+          <strong>{c.points}</strong>
         </div>
-
       ));
 
-    const SCOREBOARD_UNLOCK = new Date("2026-02-07T09:00:00Z");
-    // 3:00 AM CT = 9:00 UTC
-
-    const now = new Date();
-
-    if (now < SCOREBOARD_UNLOCK) {
-      return (
-        <div style={{ padding: "24px", textAlign: "center" }}>
-          <h2>🏅 Scoreboard Locked</h2>
-          <p>
-            The Olympic Pool scoreboard will go live at
-            <br />
-            <strong>3:00 AM CT · Saturday, February 7</strong>
-          </p>
-        </div>
-      );
-    }
-
     return (
-      <div
-        style={{
-          display: "flex",
-          gap: "16px",
-          maxHeight: "120px",
-          overflowY: "auto",
-        }}
-      >
-        <div style={{ flex: 1 }}>{renderCol(col1)}</div>
-        <div style={{ flex: 1 }}>{renderCol(col2)}</div>
+      <div className="countries-grid">
+        <div>{renderCol(col1)}</div>
+        <div>{renderCol(col2)}</div>
       </div>
     );
   };
 
-  return (
-    <div style={{ padding: "16px" }}>
-      <h2 style={{ marginBottom: "12px" }}>🌍 Olympic Pool Scoreboard</h2>
+  /* -------------------- LOCKED STATE -------------------- */
+  if (locked) {
+    return (
+      <div className="scoreboard-locked">
+        <h2>🏅 Scoreboard Locked</h2>
+        <p>
+          The Olympic Pool scoreboard goes live at
+          <br />
+          <strong>3:00 AM CT · Saturday, February 7</strong>
+        </p>
+      </div>
+    );
+  }
 
-      {/* Sticky top scrollbar */}
-      <div
-        ref={topScrollRef}
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
-          overflowX: "auto",
-          overflowY: "hidden",
-          height: "14px",
-          marginBottom: "10px",
-        }}
-      >
+  /* -------------------- RENDER -------------------- */
+  return (
+    <div className="scoreboard">
+      <h2 className="scoreboard-title">🌍 Olympic Pool Scoreboard</h2>
+
+      {/* Sticky top scrollbar (desktop only) */}
+      <div ref={topScrollRef} className="scoreboard-top-scroll">
         <div style={{ width: `${users.length * 276}px`, height: "1px" }} />
       </div>
 
       {/* Main scroll container */}
-      <div ref={scrollRef} style={{ overflowX: "auto" }}>
-        <div style={{ display: "flex", gap: "16px" }}>
+      <div ref={scrollRef} className="scoreboard-scroll">
+        <div className="scoreboard-cards">
           {users.length === 0 && <div>No entries yet.</div>}
 
           {users.map((user, idx) => (
-            <div
-              key={user.name}
-              style={{
-                minWidth: "260px",
-                border: "1px solid #e5e7eb",
-                borderRadius: "12px",
-                background: "#f9fafb",
-              }}
-            >
-              {/* Header */}
-              <div
-                style={{
-                  position: "sticky",
-                  top: 0,
-                  background: "#fff",
-                  borderBottom: "1px solid #e5e7eb",
-                  padding: "10px",
-                  textAlign: "center",
-                  fontWeight: 600,
-                  zIndex: 5,
-                }}
-              >
+            <div key={user.name} className="scoreboard-card">
+              <div className="scoreboard-card-header">
                 {idx === 0 && "🥇 "}
                 {idx === 1 && "🥈 "}
                 {idx === 2 && "🥉 "}
                 {user.name}
-                <div style={{ fontSize: "13px", color: "#2563eb" }}>
+                <div className="scoreboard-total">
                   Total: {user.total} pts
                 </div>
               </div>
 
-              {/* Countries */}
-              <div style={{ padding: "10px" }}>{renderCountries(user.countries)}</div>
+              <div className="scoreboard-countries">
+                {renderCountries(user.countries)}
+              </div>
             </div>
           ))}
         </div>
