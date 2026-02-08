@@ -1,21 +1,12 @@
-const express = require("express");
-const { OlympicTeams, MedalTables } = require("../models");
+const { OlympicTeams } = require("../models");
+const getMedalMap = require("../utils/getMadalMap");
 
 module.exports = function (app) {
-
   app.get("/api/scoreboard", async (req, res) => {
     try {
-      // 1️⃣ Get all roster picks
       const teams = await OlympicTeams.findAll({ raw: true });
+      const medalMap = await getMedalMap();
 
-      // 2️⃣ Get medal scores
-      const medals = await MedalTables.findAll({ raw: true });
-      const medalMap = {};
-      medals.forEach((m) => {
-        medalMap[m.country_name] = m.score || 0;
-      });
-
-      // 3️⃣ Group by user and calculate points
       const usersMap = {};
 
       teams.forEach((r) => {
@@ -23,18 +14,21 @@ module.exports = function (app) {
           usersMap[r.name] = { name: r.name, countries: [], total: 0 };
         }
 
-        const points = medalMap[r.country_name] || 0;
+        const medal = medalMap[r.country_name] || {
+          score: 0,
+        };
 
         usersMap[r.name].countries.push({
           country_name: r.country_name,
-          points,
+          points: medal.score,
         });
 
-        usersMap[r.name].total += points;
+        usersMap[r.name].total += medal.score;
       });
 
-      // 4️⃣ Convert to array and sort by total descending
-      const users = Object.values(usersMap).sort((a, b) => b.total - a.total);
+      const users = Object.values(usersMap).sort(
+        (a, b) => b.total - a.total
+      );
 
       res.json(users);
     } catch (err) {
@@ -42,5 +36,4 @@ module.exports = function (app) {
       res.status(500).json({ error: "Failed to fetch scoreboard" });
     }
   });
-
-}
+};

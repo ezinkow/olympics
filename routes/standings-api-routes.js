@@ -1,23 +1,41 @@
-const { sequelize } = require("../models");
+const { OlympicTeams } = require("../models");
+const getMedalMap = require("../utils/getMadalMap");
 
 module.exports = function (app) {
-  // GET /api/standings
   app.get("/api/standings", async (req, res) => {
     try {
-      const results = await sequelize.query(
-        `
-        SELECT
-          r.name,
-          SUM(m.score) AS total,
-          GROUP_CONCAT(CONCAT(r.country_name, ': ', m.score) ORDER BY m.score DESC SEPARATOR '<br>') AS country_list
-        FROM OlympicTeams r
-        JOIN MedalTables m
-          ON m.country_name = r.country_name
-        GROUP BY r.name
-        ORDER BY total DESC;
-        `,
-        { type: sequelize.QueryTypes.SELECT }
-      );
+      const teams = await OlympicTeams.findAll({ raw: true });
+      const medalMap = await getMedalMap();
+
+      const standingsMap = {};
+
+      teams.forEach((r) => {
+        if (!standingsMap[r.name]) {
+          standingsMap[r.name] = {
+            name: r.name,
+            total: 0,
+            countries: [],
+          };
+        }
+
+        const medal = medalMap[r.country_name] || {
+          score: 0,
+        };
+
+        standingsMap[r.name].countries.push(
+          `${r.country_name}: ${medal.score}`
+        );
+
+        standingsMap[r.name].total += medal.score;
+      });
+
+      const results = Object.values(standingsMap)
+        .map((r) => ({
+          name: r.name,
+          total: r.total,
+          country_list: r.countries.join("<br>"),
+        }))
+        .sort((a, b) => b.total - a.total);
 
       res.json(results);
     } catch (err) {
