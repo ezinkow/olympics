@@ -28,6 +28,7 @@ require("./routes/olympicteams-api-routes")(app);
 require("./routes/standings-api-routes")(app);
 require("./routes/scoreboard-api-routes")(app);
 require("./routes/news-api-routes")(app);
+require("./routes/medaltable-api-routes")(app);
 
 // React Router fallback
 if (process.env.NODE_ENV === "production") {
