@@ -20,6 +20,7 @@ export default function Standings() {
 
     loadStandings();
   }, []);
+  console.log(standings)
 
   if (loading) return <div style={{ padding: 16 }}>Loading...</div>;
 

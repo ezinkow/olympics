@@ -23,22 +23,6 @@ module.exports = function (sequelize, DataTypes) {
         times_selected: {
             type: DataTypes.INTEGER,
             allowNull: true,
-        },
-        gold_count: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        silver_count: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        bronze_count: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        score: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
         }
     });
 

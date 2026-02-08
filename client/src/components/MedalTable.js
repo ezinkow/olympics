@@ -5,7 +5,7 @@ export default function CountryPoolsTable() {
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/countrypools").then((res) => {
+    axios.get("/api/medaltable").then((res) => {
       setCountries(res.data);
     });
   }, []);
@@ -61,9 +61,9 @@ export default function CountryPoolsTable() {
                   {c.country_name}
                 </td>
 
-                <td style={tdStyle}>{c.gold_count || 0}</td>
-                <td style={tdStyle}>{c.silver_count || 0}</td>
-                <td style={tdStyle}>{c.bronze_count || 0}</td>
+                <td style={tdStyle}>{c.gold || 0}</td>
+                <td style={tdStyle}>{c.silver || 0}</td>
+                <td style={tdStyle}>{c.bronze || 0}</td>
 
                 <td style={{ ...tdStyle, fontWeight: 700 }}>
                   {c.score || 0}
