@@ -18,10 +18,40 @@ export default function CountryPicks({ authInfo }) {
   const [sortBy, setSortBy] = useState("price");
   const [writeIn, setWriteIn] = useState("");
   const LOCK_TIME = new Date("2026-02-07T09:00:00Z"); // 3am CT = 9am UTC
+  const [isLocked, setIsLocked] = useState(() => new Date() >= LOCK_TIME);
 
-  const isLocked = useMemo(() => {
-    return new Date() >= LOCK_TIME;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsLocked(new Date() >= LOCK_TIME);
+    }, 60 * 1000); // check every minute
+
+    return () => clearInterval(interval);
   }, []);
+
+  if (isLocked) {
+    return (
+      <div
+        style={{
+          padding: "48px 16px",
+          maxWidth: "600px",
+          margin: "0 auto",
+          textAlign: "center",
+        }}
+      >
+        <Toaster />
+        <h2 style={{ marginBottom: "12px" }}>⏰ Submitting Teams Closed</h2>
+        <p style={{ fontSize: "16px", color: "#374151" }}>
+          The deadline to submit country picks has passed.
+        </p>
+        <p style={{ marginTop: "8px", color: "#6b7280" }}>
+          You can still view the medal table, standings, and scoreboard.
+        </p>
+      </div>
+    );
+  }
+
+
 
   /* -------------------- DATA FETCH -------------------- */
   useEffect(() => {
