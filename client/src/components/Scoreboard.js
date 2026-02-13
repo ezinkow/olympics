@@ -82,7 +82,7 @@ export default function Scoreboard() {
   /* -------------------- RENDER -------------------- */
   return (
     <div className="scoreboard">
-      <h2 className="scoreboard-title">🌍 Olympic Pool Scoreboard</h2>
+      <h2 className="scoreboard-title">🏆Scoreboard🥇</h2>
 
       {/* Sticky top scrollbar (desktop only) */}
       <div ref={topScrollRef} className="scoreboard-top-scroll">

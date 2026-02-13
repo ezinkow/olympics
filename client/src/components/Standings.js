@@ -56,7 +56,7 @@ export default function Standings() {
 
   return (
     <div style={{ padding: "16px" }}>
-      <h2 style={{ marginBottom: "16px" }}>🏅 Olympics Salary Cap Standings ⛷</h2>
+      <h2 style={{ marginBottom: "16px" }}>🏅Standings⛷</h2>
 
       <div style={{ overflowX: "auto", maxHeight: "600px", overflowY: "auto" }}>
         <table

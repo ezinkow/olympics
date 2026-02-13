@@ -25,7 +25,7 @@ export default function CountryPoolsTable() {
 
   return (
     <div style={{ padding: "16px" }}>
-      <h2 style={{ marginBottom: "16px" }}>🌍 Medal Table</h2>
+      <h2 style={{ marginBottom: "16px" }}>🏅Medal Table</h2>
 
       <div style={{ overflowX: "auto" }}>
         <table
